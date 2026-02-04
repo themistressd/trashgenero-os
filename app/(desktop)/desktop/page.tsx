@@ -27,7 +27,16 @@ export default function DesktopPage() {
     setIsClient(true);
     const saved = localStorage.getItem('desktop-icon-positions');
     if (saved) {
-      setIconPositions(JSON.parse(saved));
+      try {
+        const parsed = JSON.parse(saved);
+        // Validate structure
+        if (parsed && typeof parsed === 'object') {
+          setIconPositions(parsed);
+        }
+      } catch (error) {
+        console.error('Failed to parse icon positions from localStorage:', error);
+        localStorage.removeItem('desktop-icon-positions');
+      }
     }
   }, []);
 
@@ -72,6 +81,7 @@ export default function DesktopPage() {
                 dragElastic={0}
                 dragConstraints={containerRef}
                 onDragEnd={(e, info) => {
+                  // info.point gives absolute position on page, we need relative to container
                   const currentPos = iconPositions[icon.id] || icon.position;
                   const newPos = {
                     x: currentPos.x + info.offset.x,
@@ -79,7 +89,11 @@ export default function DesktopPage() {
                   };
                   const updated = { ...iconPositions, [icon.id]: newPos };
                   setIconPositions(updated);
-                  localStorage.setItem('desktop-icon-positions', JSON.stringify(updated));
+                  try {
+                    localStorage.setItem('desktop-icon-positions', JSON.stringify(updated));
+                  } catch (error) {
+                    console.error('Failed to save icon positions to localStorage:', error);
+                  }
                 }}
                 style={{
                   position: 'absolute',

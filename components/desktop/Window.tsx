@@ -61,8 +61,8 @@ export default function Window({
       dragConstraints={{
         left: 0,
         top: 0,
-        right: typeof window !== 'undefined' ? window.innerWidth - (isMaximized ? 0 : initialSize.width) : 0,
-        bottom: typeof window !== 'undefined' ? window.innerHeight - (isMaximized ? 0 : initialSize.height) - 40 : 0,
+        right: typeof window !== 'undefined' ? window.innerWidth - (isMaximized ? 0 : windowData.size.width) : 0,
+        bottom: typeof window !== 'undefined' ? window.innerHeight - (isMaximized ? 0 : windowData.size.height) - 40 : 0,
       }}
       onMouseDown={handleMouseDown}
       style={{
@@ -77,7 +77,7 @@ export default function Window({
     >
       {/* Title Bar */}
       <div
-        className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-[#FF00FF] px-2 py-1 flex items-center justify-between"
+        className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-bubblegum-pink px-2 py-1 flex items-center justify-between"
         style={{ cursor: isMaximized ? 'default' : 'move' }}
       >
         <span className="flex items-center gap-2">

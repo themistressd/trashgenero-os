@@ -89,12 +89,28 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
     
     if (!window) return;
 
+    // Normalize z-index if it gets too high
+    let newHighestZIndex = highestZIndex + 1;
+    let updatedWindows = windows;
+    
+    if (newHighestZIndex > 10000) {
+      // Reset all z-indices while maintaining order
+      const sortedWindows = [...windows].sort((a, b) => a.zIndex - b.zIndex);
+      updatedWindows = sortedWindows.map((w, index) => ({
+        ...w,
+        zIndex: 1000 + index + (w.id === id ? 1 : 0),
+      }));
+      newHighestZIndex = 1000 + windows.length;
+    } else {
+      updatedWindows = windows.map((w) =>
+        w.id === id ? { ...w, zIndex: newHighestZIndex } : w
+      );
+    }
+
     set({
-      windows: windows.map((w) =>
-        w.id === id ? { ...w, zIndex: highestZIndex + 1 } : w
-      ),
+      windows: updatedWindows,
       activeWindow: id,
-      highestZIndex: highestZIndex + 1,
+      highestZIndex: newHighestZIndex,
     });
   },
 
