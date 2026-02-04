@@ -5,12 +5,44 @@ import type { DesktopIcon } from '@/types/desktop';
  */
 export const DESKTOP_ICONS: DesktopIcon[] = [
   {
+    id: 'mistress-d',
+    name: 'Mistress D.exe',
+    icon: '⚡',
+    route: '/apps/mistress-d',
+    description: 'Bio, manifiesto y archivo personal.',
+    position: { x: 20, y: 20 },
+  },
+  {
+    id: 'divas',
+    name: 'Divas.rar',
+    icon: '👯‍♀️',
+    route: '/apps/divas',
+    description: 'Lore y personajes del universo TrashGènero.',
+    position: { x: 20, y: 140 },
+  },
+  {
+    id: 'stalker-zone',
+    name: 'STsLK3R_Z0NE',
+    icon: '📡',
+    route: '/apps/stalker-zone',
+    description: 'Redes sociales en modo retro.',
+    position: { x: 20, y: 260 },
+  },
+  {
+    id: 'centerfolds',
+    name: 'CENTERFOLDS.zip',
+    icon: '📌',
+    route: '/apps/centerfolds',
+    description: 'Lookbooks, editoriales y archivo visual.',
+    position: { x: 20, y: 380 },
+  },
+  {
     id: 'trashtienda',
     name: 'Trashtienda.exe',
     icon: '🛍️',
     route: '/apps/trashtienda',
     description: 'Tienda oficial. Scroll infinito de productos prohibidos.',
-    position: { x: 20, y: 20 },
+    position: { x: 140, y: 20 },
   },
   {
     id: 'secta-trash',
@@ -18,7 +50,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '🎮',
     route: '/apps/secta-trash',
     description: 'Dashboard de gamificación: puntos, rangos, logros y progreso.',
-    position: { x: 20, y: 140 },
+    position: { x: 140, y: 140 },
   },
   {
     id: 'mi-secta',
@@ -26,7 +58,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '👤',
     route: '/apps/mi-secta',
     description: 'Tu perfil, rango, estampitas y progreso en el culto.',
-    position: { x: 20, y: 260 },
+    position: { x: 140, y: 260 },
   },
   {
     id: 'rituales',
@@ -34,7 +66,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '🔮',
     route: '/apps/rituales',
     description: 'Calendario de eventos, drops y rituales secretos.',
-    position: { x: 20, y: 380 },
+    position: { x: 140, y: 380 },
   },
   {
     id: 'altar',
@@ -42,7 +74,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '✨',
     route: '/apps/altar',
     description: 'Tus reliquias coleccionadas y logros desbloqueados.',
-    position: { x: 20, y: 500 },
+    position: { x: 140, y: 500 },
   },
   {
     id: 'grimorio',
@@ -50,7 +82,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '📖',
     route: '/apps/grimorio',
     description: 'Blog, manifiestos y la biblia trash.',
-    position: { x: 20, y: 620 },
+    position: { x: 140, y: 620 },
   },
   {
     id: 'transmisiones',
@@ -58,7 +90,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '📡',
     route: '/apps/transmisiones',
     description: 'Live streams, replays y contenido exclusivo.',
-    position: { x: 140, y: 20 },
+    position: { x: 260, y: 20 },
   },
   {
     id: 'pesetrash-wallet',
@@ -66,7 +98,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '🪙',
     route: '/apps/pesetrash-wallet',
     description: 'Tu wallet de Pesetrash, historial y transacciones.',
-    position: { x: 140, y: 140 },
+    position: { x: 260, y: 140 },
   },
   {
     id: 'carrito',
@@ -74,7 +106,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '🛒',
     route: '/apps/carrito',
     description: 'Tu carrito de compras actual.',
-    position: { x: 140, y: 260 },
+    position: { x: 260, y: 260 },
   },
   {
     id: 'ajustes',
@@ -82,7 +114,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '⚙️',
     route: '/apps/ajustes',
     description: 'Configuración del sistema, wallpapers y preferencias.',
-    position: { x: 140, y: 380 },
+    position: { x: 260, y: 380 },
   },
 ];
 

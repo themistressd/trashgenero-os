@@ -11,6 +11,10 @@ import StaticNoise from '@/components/effects/StaticNoise';
 import Window from '@/components/desktop/Window';
 import SectaTrash from '@/components/apps/SectaTrash/SectaTrash';
 import Trashtienda from '@/components/apps/Trashtienda/Trashtienda';
+import MistressD from '@/components/apps/MistressD/MistressD';
+import Divas from '@/components/apps/Divas/Divas';
+import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
+import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import '@/styles/themes/trash-os.css';
 
@@ -75,7 +79,7 @@ export default function DesktopPage() {
         {/* Desktop Icons */}
         <div ref={containerRef} className="relative z-10 p-4 w-full h-full">
           <div className="grid gap-4">
-            {isClient && DESKTOP_ICONS.slice(0, 4).map((icon) => (
+            {isClient && DESKTOP_ICONS.map((icon) => (
               <motion.div
                 key={icon.id}
                 drag
@@ -135,12 +139,40 @@ export default function DesktopPage() {
               {(window.component === 'secta-trash' || window.component === '/apps/secta-trash') && (
                 <SectaTrash />
               )}
+
+              {/* Render MistressD component */}
+              {(window.component === 'mistress-d' || window.component === '/apps/mistress-d') && (
+                <MistressD />
+              )}
+
+              {/* Render Divas component */}
+              {(window.component === 'divas' || window.component === '/apps/divas') && (
+                <Divas />
+              )}
+
+              {/* Render StalkerZone component */}
+              {(window.component === 'stalker-zone' || window.component === '/apps/stalker-zone') && (
+                <StalkerZone />
+              )}
+
+              {/* Render Centerfolds component */}
+              {(window.component === 'centerfolds' || window.component === '/apps/centerfolds') && (
+                <Centerfolds />
+              )}
               
               {/* Default placeholder for other apps */}
               {window.component !== 'trashtienda' && 
                window.component !== '/apps/trashtienda' &&
                window.component !== 'secta-trash' && 
-               window.component !== '/apps/secta-trash' && (
+               window.component !== '/apps/secta-trash' &&
+               window.component !== 'mistress-d' && 
+               window.component !== '/apps/mistress-d' &&
+               window.component !== 'divas' && 
+               window.component !== '/apps/divas' &&
+               window.component !== 'stalker-zone' && 
+               window.component !== '/apps/stalker-zone' &&
+               window.component !== 'centerfolds' && 
+               window.component !== '/apps/centerfolds' && (
                 <div className="font-vt323 text-lg p-4">
                   <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
                     {window.title}

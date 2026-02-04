@@ -57,6 +57,15 @@ export interface WPPost {
   tags: number[];
 }
 
+export interface WPTerm {
+  id: number;
+  name: string;
+  slug: string;
+  taxonomy: string;
+  description?: string;
+  count?: number;
+}
+
 export interface WPMedia {
   id: number;
   date: string;
@@ -101,6 +110,19 @@ export interface WPMedia {
     };
   };
   source_url: string;
+}
+
+export interface WPEmbedded {
+  'wp:featuredmedia'?: WPMedia[];
+  'wp:term'?: WPTerm[][];
+}
+
+export interface WPPage extends WPPost {
+  _embedded?: WPEmbedded;
+}
+
+export interface WPCustomPost extends WPPost {
+  _embedded?: WPEmbedded;
 }
 
 export interface WPAPIError {

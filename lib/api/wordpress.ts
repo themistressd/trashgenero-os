@@ -1,5 +1,5 @@
 import apiClient, { makeAuthenticatedRequest } from './client';
-import type { WPUser, WPPost, WPMedia } from '@/types/wordpress';
+import type { WPUser, WPPost, WPMedia, WPPage, WPCustomPost, WPTerm } from '@/types/wordpress';
 
 /**
  * WordPress API client
@@ -48,6 +48,49 @@ export const getMedia = async (mediaId: number): Promise<WPMedia> => {
   return makeAuthenticatedRequest<WPMedia>({
     method: 'GET',
     url: `/wp/v2/media/${mediaId}`,
+  });
+};
+
+// Get page by slug
+export const getPageBySlug = async (slug: string): Promise<WPPage | null> => {
+  const pages = await makeAuthenticatedRequest<WPPage[]>({
+    method: 'GET',
+    url: '/wp/v2/pages',
+    params: { slug },
+  });
+  return pages[0] || null;
+};
+
+// Get divas (custom post type)
+export const getDivas = async (params?: {
+  per_page?: number;
+  page?: number;
+  tipo_diva?: number;
+}): Promise<WPCustomPost[]> => {
+  return makeAuthenticatedRequest<WPCustomPost[]>({
+    method: 'GET',
+    url: '/wp/v2/divas',
+    params: { _embed: true, ...params },
+  });
+};
+
+// Get diva types (taxonomy)
+export const getDivaTypes = async (): Promise<WPTerm[]> => {
+  return makeAuthenticatedRequest<WPTerm[]>({
+    method: 'GET',
+    url: '/wp/v2/tipo-diva',
+  });
+};
+
+// Get lookbooks (custom post type)
+export const getLookbooks = async (params?: {
+  per_page?: number;
+  page?: number;
+}): Promise<WPCustomPost[]> => {
+  return makeAuthenticatedRequest<WPCustomPost[]>({
+    method: 'GET',
+    url: '/wp/v2/lookbook',
+    params: { _embed: true, ...params },
   });
 };
 
