@@ -161,3 +161,33 @@
 .taskbar-button.active {
   border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
 }
+
+.retro-content h1,
+.retro-content h2,
+.retro-content h3 {
+  font-family: 'VT323', monospace;
+  color: var(--win95-blue);
+}
+
+.retro-content p,
+.retro-content li {
+  line-height: 1.5;
+}
+
+.retro-content ul {
+  list-style: square;
+  padding-left: 20px;
+}
+
+.retro-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.retro-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--bubblegum-pink);
+  border: 2px solid var(--win95-white);
+}
+
+.retro-scrollbar::-webkit-scrollbar-track {
+  background: var(--win95-light-gray);
+}
