@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { getProducts, getProductById } from '@/lib/api/woocommerce';
+import { getProducts, getProductById, getCategories } from '@/lib/api/woocommerce';
 import type { Product } from '@/types/woocommerce';
 
 /**
@@ -48,6 +48,27 @@ export const useProduct = (productId: number | null) => {
 
   return {
     product: data,
+    isLoading,
+    isError: error,
+    refresh: mutate,
+  };
+};
+
+/**
+ * Hook to fetch categories
+ */
+export const useCategories = () => {
+  const { data, error, isLoading, mutate } = useSWR<Array<{ id: number; name: string; slug: string; count: number }>>(
+    'categories',
+    getCategories,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 300000, // 5 minutes cache
+    }
+  );
+
+  return {
+    categories: data || [],
     isLoading,
     isError: error,
     refresh: mutate,
