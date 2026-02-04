@@ -8,7 +8,7 @@ import type {
   PointHistoryResponse,
 } from '@/types/gamification';
 
-const namespace = process.env.GAMIPRESS_API_NAMESPACE || 'trashgenero/v1';
+const namespace = process.env.NEXT_PUBLIC_GAMIPRESS_API_NAMESPACE || 'trashgenero/v1';
 
 /**
  * GamiPress API client
