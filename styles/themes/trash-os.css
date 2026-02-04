@@ -1,0 +1,163 @@
+:root {
+  /* Toxic Palette */
+  --void-black: #000000;
+  --system-gray: #C0C0C0;
+  --bubblegum-pink: #FF00FF;
+  --hacker-green: #00FF00;
+  --glitch-blue: #0000FF;
+  
+  /* Windows 95 Colors */
+  --win95-gray: #C0C0C0;
+  --win95-dark-gray: #808080;
+  --win95-light-gray: #DFDFDF;
+  --win95-black: #000000;
+  --win95-white: #FFFFFF;
+  --win95-blue: #000080;
+  
+  /* Spacing */
+  --window-padding: 2px;
+  --window-border: 2px;
+}
+
+/* Windows 95 Button Style */
+.win95-button {
+  background: var(--win95-gray);
+  border: 2px solid;
+  border-color: var(--win95-white) var(--win95-dark-gray) var(--win95-dark-gray) var(--win95-white);
+  padding: 4px 12px;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+}
+
+.win95-button:active {
+  border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+  padding-top: 5px;
+  padding-left: 13px;
+}
+
+.win95-button:disabled {
+  color: var(--win95-dark-gray);
+  cursor: not-allowed;
+}
+
+/* Windows 95 Window Style */
+.win95-window {
+  background: var(--win95-gray);
+  border: 2px solid;
+  border-color: var(--win95-white) var(--win95-dark-gray) var(--win95-dark-gray) var(--win95-white);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.win95-window-title {
+  background: var(--win95-blue);
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  color: white;
+  padding: 4px 6px;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.win95-window-body {
+  padding: 8px;
+  background: var(--win95-gray);
+}
+
+/* Windows 95 Input */
+.win95-input {
+  background: var(--win95-white);
+  border: 2px solid;
+  border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+  padding: 4px;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+}
+
+/* Toxic Glitch Effects */
+.toxic-text {
+  color: var(--hacker-green);
+  text-shadow: 2px 0 0 var(--bubblegum-pink), -2px 0 0 var(--glitch-blue);
+}
+
+.toxic-border {
+  border: 2px solid var(--hacker-green);
+  box-shadow: 0 0 10px var(--hacker-green);
+}
+
+/* Desktop Background */
+.desktop-background {
+  background: var(--void-black);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Icon Styles */
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
+  width: 80px;
+}
+
+.desktop-icon:hover {
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid var(--hacker-green);
+}
+
+.desktop-icon.selected {
+  background: rgba(255, 0, 255, 0.2);
+  border: 1px solid var(--bubblegum-pink);
+}
+
+.desktop-icon-image {
+  font-size: 48px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.8));
+}
+
+.desktop-icon-name {
+  color: var(--system-gray);
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+  word-wrap: break-word;
+}
+
+/* Taskbar */
+.taskbar {
+  background: var(--win95-gray);
+  border-top: 2px solid var(--win95-white);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 4px;
+}
+
+.taskbar-button {
+  background: var(--win95-gray);
+  border: 2px solid;
+  border-color: var(--win95-white) var(--win95-dark-gray) var(--win95-dark-gray) var(--win95-white);
+  padding: 4px 12px;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 100px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskbar-button.active {
+  border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+}

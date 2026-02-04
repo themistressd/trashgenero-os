@@ -1,0 +1,121 @@
+:root {
+  /* Game Boy/Sidekick Colors */
+  --gb-background: #9BBC0F;
+  --gb-dark: #0F380F;
+  --gb-mid: #306230;
+  --gb-light: #8BAC0F;
+  
+  /* Sidekick inspired */
+  --sidekick-bg: #1a1a2e;
+  --sidekick-accent: #16213e;
+  --sidekick-highlight: #0f3460;
+  --sidekick-text: #e94560;
+}
+
+/* Mobile Container */
+.trash-mate-container {
+  background: var(--sidekick-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Game Boy Style Screen */
+.gb-screen {
+  background: var(--gb-background);
+  border: 4px solid var(--gb-dark);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: inset -2px -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.gb-text {
+  color: var(--gb-dark);
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 14px;
+  text-shadow: 1px 1px 0 var(--gb-mid);
+}
+
+/* Sidekick Style Card */
+.sidekick-card {
+  background: var(--sidekick-accent);
+  border: 2px solid var(--sidekick-highlight);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--sidekick-text);
+}
+
+/* Mobile Button */
+.trash-mate-button {
+  background: var(--sidekick-accent);
+  border: 2px solid var(--sidekick-text);
+  color: var(--sidekick-text);
+  padding: 8px 16px;
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trash-mate-button:active {
+  background: var(--sidekick-highlight);
+  transform: scale(0.95);
+}
+
+/* Mobile Navigation */
+.trash-mate-nav {
+  background: var(--sidekick-accent);
+  border-top: 2px solid var(--sidekick-highlight);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+}
+
+.trash-mate-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  color: var(--sidekick-text);
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.trash-mate-nav-item.active {
+  background: var(--sidekick-highlight);
+}
+
+/* Mobile Icon */
+.trash-mate-icon {
+  font-size: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  color: var(--sidekick-text);
+  cursor: pointer;
+}
+
+.trash-mate-icon-label {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Pixel animations for mobile */
+@keyframes pixel-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.pixel-bounce {
+  animation: pixel-bounce 0.6s ease-in-out infinite;
+}

@@ -1,0 +1,66 @@
+/* Scanlines Effect */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Animated Scanlines */
+.scanlines-animated {
+  position: relative;
+}
+
+.scanlines-animated::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 0, 0.1) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 100;
+  animation: scanline-move 8s linear infinite;
+}
+
+@keyframes scanline-move {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(200vh);
+  }
+}
+
+/* Heavy Scanlines (more visible) */
+.scanlines-heavy::before {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.3) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
