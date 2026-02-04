@@ -1,12 +1,10 @@
 import { useEffect } from 'react';
 import { useBootStore } from '@/lib/store/bootStore';
-import { useRouter } from 'next/navigation';
 
 /**
  * Hook to manage boot sequence
  */
 export const useBootSequence = () => {
-  const router = useRouter();
   const {
     currentStage,
     hasBooted,
@@ -22,7 +20,7 @@ export const useBootSequence = () => {
     reset,
   } = useBootStore();
 
-  // Check if should skip boot on mount
+  // Check if boot sequence should be shown
   useEffect(() => {
     const enableBootSequence = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
     
@@ -30,7 +28,7 @@ export const useBootSequence = () => {
       // Skip boot and go directly to desktop
       setStage('desktop');
     }
-  }, []);
+  }, [hasBooted, skipBoot, setStage]);
 
   // Auto-advance through boot stages
   const startBootSequence = (autoAdvance: boolean = true) => {

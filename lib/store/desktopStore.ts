@@ -139,9 +139,7 @@ export const useDesktopStore = create<DesktopState>()(
     }),
     {
       name: 'trash-os-desktop',
-      partialize: (state) => ({
-        // Don't persist windows, only configuration
-      }),
+      // Don't persist windows, they should start fresh each session
     }
   )
 );

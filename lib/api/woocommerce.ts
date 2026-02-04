@@ -1,5 +1,5 @@
-import apiClient, { makeAuthenticatedRequest } from './client';
-import type { Product, Cart, CartItem, Order, CheckoutData } from '@/types/woocommerce';
+import { makeAuthenticatedRequest } from './client';
+import type { Product, Cart, Order, CheckoutData } from '@/types/woocommerce';
 
 /**
  * WooCommerce API client

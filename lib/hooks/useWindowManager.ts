@@ -1,5 +1,4 @@
 import { useDesktopStore } from '@/lib/store/desktopStore';
-import type { WindowConfig } from '@/types/window';
 
 /**
  * Hook to manage desktop windows

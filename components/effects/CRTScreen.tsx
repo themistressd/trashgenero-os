@@ -5,7 +5,6 @@ import '@/styles/effects/crt.css';
 
 interface CRTScreenProps {
   children: React.ReactNode;
-  intensity?: 'light' | 'medium' | 'heavy';
   flicker?: boolean;
   turnOn?: boolean;
   className?: string;
@@ -13,7 +12,6 @@ interface CRTScreenProps {
 
 export default function CRTScreen({
   children,
-  intensity = 'medium',
   flicker = false,
   turnOn = false,
   className = '',

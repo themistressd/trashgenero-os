@@ -32,7 +32,7 @@ export default function GlitchLogo({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-void-black">
-      <GlitchEffect active intensity="heavy">
+      <GlitchEffect active>
         <ChromaticAberration intensity="heavy">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}

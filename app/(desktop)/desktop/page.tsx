@@ -11,7 +11,7 @@ import '@/styles/themes/trash-os.css';
 
 export default function DesktopPage() {
   const router = useRouter();
-  const { hasBooted, currentStage } = useBootStore();
+  const { hasBooted } = useBootStore();
 
   useEffect(() => {
     // Check if boot sequence should be shown

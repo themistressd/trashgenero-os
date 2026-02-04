@@ -135,7 +135,7 @@ export const routeRequiresAuth = (path: string): boolean => {
 /**
  * Check if user can access route based on rank
  */
-export const canAccessRoute = (path: string, userRank?: string): boolean => {
+export const canAccessRoute = (path: string, _userRank?: string): boolean => {
   const route = getRouteByPath(path);
   if (!route) return false;
   if (route.isPublic) return true;

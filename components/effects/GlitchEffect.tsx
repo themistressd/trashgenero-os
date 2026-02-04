@@ -6,7 +6,6 @@ import '@/styles/effects/glitch.css';
 interface GlitchEffectProps {
   children: React.ReactNode;
   active?: boolean;
-  intensity?: 'light' | 'medium' | 'heavy';
   trigger?: 'always' | 'hover' | 'random';
   className?: string;
 }
@@ -14,7 +13,6 @@ interface GlitchEffectProps {
 export default function GlitchEffect({
   children,
   active = true,
-  intensity = 'medium',
   trigger = 'always',
   className = '',
 }: GlitchEffectProps) {

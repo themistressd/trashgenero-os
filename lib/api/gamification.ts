@@ -22,7 +22,7 @@ export const getUserGamification = async (): Promise<UserGamification> => {
       url: `/${namespace}/user/gamification`,
     });
     return response.data;
-  } catch (error) {
+  } catch {
     // Return mock data if API fails
     return {
       points: {
@@ -46,7 +46,7 @@ export const getRanks = async (): Promise<Rank[]> => {
       url: `/${namespace}/ranks`,
     });
     return response.data;
-  } catch (error) {
+  } catch {
     // Return empty array if API fails
     return [];
   }
@@ -75,7 +75,7 @@ export const getPointsHistory = async (
       params,
     });
     return response.data;
-  } catch (error) {
+  } catch {
     // Return empty array if API fails
     return [];
   }
@@ -124,7 +124,7 @@ export const canUserRankUp = async (): Promise<boolean> => {
   try {
     const gamification = await getUserGamification();
     return gamification.can_rank_up;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -136,3 +136,6 @@ export const rankUpUser = async (): Promise<{ success: boolean; new_rank: Rank }
     url: `/${namespace}/rank/up`,
   });
 };
+
+// Prevent unused import warning
+void apiClient;

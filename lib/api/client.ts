@@ -55,7 +55,7 @@ apiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return apiClient(originalRequest);
         }
-      } catch (refreshError) {
+      } catch {
         // Refresh failed, clear tokens and redirect to login
         localStorage.removeItem('wp_token');
         localStorage.removeItem('wp_refresh_token');
@@ -72,12 +72,15 @@ apiClient.interceptors.response.use(
 export default apiClient;
 
 // Helper function for handling API errors
-export const handleApiError = (error: any): string => {
-  if (error.response?.data?.message) {
-    return error.response.data.message;
-  }
-  if (error.message) {
-    return error.message;
+export const handleApiError = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    if (err.response?.data?.message) {
+      return err.response.data.message;
+    }
+    if (err.message) {
+      return err.message;
+    }
   }
   return 'An unexpected error occurred';
 };
