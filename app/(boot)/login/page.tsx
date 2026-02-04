@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import AutoLogin from '@/components/boot/AutoLogin';
+import FakeLoginScreen from '@/components/boot/FakeLoginScreen';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,5 +10,5 @@ export default function LoginPage() {
     router.push('/desktop');
   };
 
-  return <AutoLogin onComplete={handleComplete} />;
+  return <FakeLoginScreen onComplete={handleComplete} />;
 }

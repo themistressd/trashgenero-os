@@ -1,28 +1,28 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useBootStore } from '@/lib/store/bootStore';
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const router = useRouter();
-  const { hasBooted, skipBoot } = useBootStore();
-
+  const router = useRouter()
+  
   useEffect(() => {
-    const enableBootSequence = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
+    // Verificar si queremos saltar la boot sequence (desde .env.local)
+    const skipBoot = process.env.NEXT_PUBLIC_SKIP_BOOT === 'true'
     
-    if (enableBootSequence && !hasBooted && !skipBoot) {
-      // Show boot sequence
-      router.push('/bios');
+    if (skipBoot) {
+      router.push('/desktop')
     } else {
-      // Go directly to desktop
-      router.push('/desktop');
+      router.push('/bios')
     }
-  }, [hasBooted, skipBoot, router]);
-
+  }, [router])
+  
+  // Mostrar una pantalla negra mientras redirige
   return (
-    <div className="flex min-h-screen items-center justify-center bg-void-black">
-      <div className="animate-spin text-4xl">⚡</div>
+    <div className="w-screen h-screen bg-black flex items-center justify-center">
+      <div className="text-green-toxic font-mono animate-pulse">
+        Initializing TrashGènero OS...
+      </div>
     </div>
-  );
+  )
 }
