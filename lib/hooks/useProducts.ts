@@ -39,7 +39,7 @@ export const useProducts = (params?: {
 export const useProduct = (productId: number | null) => {
   const { data, error, isLoading, mutate } = useSWR<Product>(
     productId ? ['product', productId] : null,
-    () => (productId ? getProductById(productId) : null),
+    productId ? () => getProductById(productId) : null,
     {
       revalidateOnFocus: false,
       dedupingInterval: 60000,
