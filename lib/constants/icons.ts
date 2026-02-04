@@ -13,12 +13,20 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     position: { x: 20, y: 20 },
   },
   {
+    id: 'secta-trash',
+    name: 'SectaTrash.exe',
+    icon: '🎮',
+    route: '/apps/secta-trash',
+    description: 'Dashboard de gamificación: puntos, rangos, logros y progreso.',
+    position: { x: 20, y: 140 },
+  },
+  {
     id: 'mi-secta',
     name: 'MiSecta.exe',
     icon: '👤',
     route: '/apps/mi-secta',
     description: 'Tu perfil, rango, estampitas y progreso en el culto.',
-    position: { x: 20, y: 140 },
+    position: { x: 20, y: 260 },
   },
   {
     id: 'rituales',
@@ -26,7 +34,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '🔮',
     route: '/apps/rituales',
     description: 'Calendario de eventos, drops y rituales secretos.',
-    position: { x: 20, y: 260 },
+    position: { x: 20, y: 380 },
   },
   {
     id: 'altar',
@@ -34,7 +42,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '✨',
     route: '/apps/altar',
     description: 'Tus reliquias coleccionadas y logros desbloqueados.',
-    position: { x: 20, y: 380 },
+    position: { x: 20, y: 500 },
   },
   {
     id: 'grimorio',
@@ -42,7 +50,7 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     icon: '📖',
     route: '/apps/grimorio',
     description: 'Blog, manifiestos y la biblia trash.',
-    position: { x: 20, y: 500 },
+    position: { x: 20, y: 620 },
   },
   {
     id: 'transmisiones',

@@ -9,6 +9,7 @@ import CRTScreen from '@/components/effects/CRTScreen';
 import Scanlines from '@/components/effects/Scanlines';
 import StaticNoise from '@/components/effects/StaticNoise';
 import Window from '@/components/desktop/Window';
+import SectaTrash from '@/components/apps/SectaTrash/SectaTrash';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import '@/styles/themes/trash-os.css';
 
@@ -73,7 +74,7 @@ export default function DesktopPage() {
         {/* Desktop Icons */}
         <div ref={containerRef} className="relative z-10 p-4 w-full h-full">
           <div className="grid gap-4">
-            {isClient && DESKTOP_ICONS.slice(0, 3).map((icon) => (
+            {isClient && DESKTOP_ICONS.slice(0, 4).map((icon) => (
               <motion.div
                 key={icon.id}
                 drag
@@ -124,13 +125,21 @@ export default function DesktopPage() {
               initialPosition={window.position}
               initialSize={window.size}
             >
-              <div className="font-vt323 text-lg p-4">
-                <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
-                  {window.title}
-                </h2>
-                <p className="text-gray-800">Contenido de {window.component}</p>
-                <p className="text-gray-600 mt-2">Esta ventana es funcional y se puede arrastrar, minimizar, maximizar y cerrar.</p>
-              </div>
+              {/* Render SectaTrash component */}
+              {(window.component === 'secta-trash' || window.component === '/apps/secta-trash') && (
+                <SectaTrash />
+              )}
+              
+              {/* Default placeholder for other apps */}
+              {window.component !== 'secta-trash' && window.component !== '/apps/secta-trash' && (
+                <div className="font-vt323 text-lg p-4">
+                  <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
+                    {window.title}
+                  </h2>
+                  <p className="text-gray-800">Contenido de {window.component}</p>
+                  <p className="text-gray-600 mt-2">Esta ventana es funcional y se puede arrastrar, minimizar, maximizar y cerrar.</p>
+                </div>
+              )}
             </Window>
           ))}
         </AnimatePresence>
