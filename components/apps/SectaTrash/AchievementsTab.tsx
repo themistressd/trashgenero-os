@@ -1,0 +1,185 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useAchievements } from '@/lib/hooks/useGamification';
+import type { Achievement } from '@/types/gamification';
+
+export default function AchievementsTab() {
+  const { achievements, unlocked, locked, isLoading } = useAchievements();
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="font-vt323 text-lg text-gray-600">Cargando logros...</div>
+      </div>
+    );
+  }
+
+  const handleAchievementClick = (achievement: Achievement) => {
+    setSelectedAchievement(
+      selectedAchievement?.id === achievement.id ? null : achievement
+    );
+  };
+
+  const formatUnlockedDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  return (
+    <div className="space-y-6 p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-vcr text-2xl text-bubblegum-pink">
+          🏆 Logros Desbloqueados
+        </h2>
+        <div className="font-vt323 text-lg text-gray-700">
+          {unlocked.length} / {achievements.length}
+        </div>
+      </div>
+
+      {/* Unlocked Achievements Grid */}
+      {unlocked.length > 0 && (
+        <div>
+          <h3 className="mb-3 font-vt323 text-lg font-bold text-gray-800">
+            ✨ Desbloqueados
+          </h3>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {unlocked.map((achievement, index) => (
+              <motion.div
+                key={achievement.id}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleAchievementClick(achievement)}
+                className="win95-input cursor-pointer bg-white p-3 transition-all hover:border-bubblegum-pink"
+                title={achievement.description}
+              >
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="text-4xl">{achievement.icon}</div>
+                  <div className="font-vt323 text-xs font-bold text-gray-800">
+                    {achievement.title}
+                  </div>
+                  <div className="font-vt323 text-xs text-purple-600">
+                    +{achievement.points_awarded} pts
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Locked Achievements */}
+      {locked.length > 0 && (
+        <div>
+          <h3 className="mb-3 font-vt323 text-lg font-bold text-gray-600">
+            🔒 Bloqueados ({locked.length})
+          </h3>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {locked.slice(0, 8).map((achievement, index) => (
+              <motion.div
+                key={achievement.id}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: (unlocked.length + index) * 0.05 }}
+                onClick={() => handleAchievementClick(achievement)}
+                className="win95-input cursor-pointer bg-gray-100 p-3 grayscale hover:grayscale-0"
+                title={achievement.description}
+              >
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="text-4xl opacity-50">{achievement.icon}</div>
+                  <div className="font-vt323 text-xs text-gray-500">
+                    {achievement.title}
+                  </div>
+                  <div className="font-vt323 text-xs text-gray-400">
+                    +{achievement.points_awarded} pts
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          {locked.length > 8 && (
+            <div className="mt-3 text-center">
+              <button className="win95-button px-4 py-2 font-vt323 text-sm">
+                Ver Todos ({locked.length})
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Achievement Detail Modal */}
+      {selectedAchievement && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setSelectedAchievement(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="win95-window w-full max-w-md"
+          >
+            <div className="win95-window-title bg-gradient-to-r from-purple-600 to-bubblegum-pink">
+              <span className="font-vt323">
+                {selectedAchievement.unlocked ? '🏆' : '🔒'} Logro
+              </span>
+            </div>
+            <div className="win95-window-body space-y-4 bg-white p-6">
+              <div className="text-center text-6xl">{selectedAchievement.icon}</div>
+              <h3 className="text-center font-vcr text-2xl text-bubblegum-pink">
+                {selectedAchievement.title}
+              </h3>
+              <p className="text-center font-vt323 text-base text-gray-700">
+                {selectedAchievement.description}
+              </p>
+              <div className="rounded bg-purple-100 p-3 text-center">
+                <div className="font-vt323 text-lg font-bold text-purple-600">
+                  +{selectedAchievement.points_awarded} Pesetrash
+                </div>
+              </div>
+              {selectedAchievement.unlocked && selectedAchievement.unlocked_at && (
+                <div className="text-center font-vt323 text-sm text-gray-600">
+                  Desbloqueado el {formatUnlockedDate(selectedAchievement.unlocked_at)}
+                </div>
+              )}
+              {!selectedAchievement.unlocked && (
+                <div className="text-center font-vt323 text-sm text-gray-600">
+                  Todavía no desbloqueado
+                </div>
+              )}
+              <div className="text-center">
+                <button
+                  onClick={() => setSelectedAchievement(null)}
+                  className="win95-button px-6 py-2 font-vt323"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Empty State */}
+      {achievements.length === 0 && (
+        <div className="flex h-64 flex-col items-center justify-center text-center">
+          <div className="mb-4 text-6xl">🏆</div>
+          <div className="font-vt323 text-lg text-gray-600">
+            No hay logros disponibles todavía
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

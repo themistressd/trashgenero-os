@@ -64,3 +64,53 @@ export interface PointHistoryResponse {
   success: boolean;
   data: PointHistory[];
 }
+
+// Achievement Types
+export interface Achievement {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlocked_at?: string;
+  points_awarded: number;
+  image?: string;
+}
+
+export interface AchievementsResponse {
+  success: boolean;
+  data: Achievement[];
+}
+
+// User Stats Types
+export interface UserStats {
+  total_points_earned: number;
+  challenges_completed: number;
+  achievements_unlocked: number;
+  days_active: number;
+  current_streak: number;
+  total_purchases: number;
+  total_spent: number;
+}
+
+export interface StatsResponse {
+  success: boolean;
+  data: UserStats;
+}
+
+// Activity Log Types
+export interface ActivityLog {
+  id: number;
+  type: 'points' | 'achievement' | 'rank' | 'purchase' | 'challenge';
+  title: string;
+  description: string;
+  amount?: number;
+  currency?: 'pesetrash' | 'estampitas' | 'reliquias';
+  timestamp: string;
+  icon?: string;
+}
+
+export interface ActivityLogsResponse {
+  success: boolean;
+  data: ActivityLog[];
+}

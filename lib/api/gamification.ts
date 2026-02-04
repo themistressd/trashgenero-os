@@ -6,6 +6,12 @@ import type {
   GamificationResponse,
   RanksResponse,
   PointHistoryResponse,
+  Achievement,
+  AchievementsResponse,
+  UserStats,
+  StatsResponse,
+  ActivityLog,
+  ActivityLogsResponse,
 } from '@/types/gamification';
 
 const namespace = process.env.NEXT_PUBLIC_GAMIPRESS_API_NAMESPACE || 'trashgenero/v1';
@@ -135,6 +141,140 @@ export const rankUpUser = async (): Promise<{ success: boolean; new_rank: Rank }
     method: 'POST',
     url: `/${namespace}/rank/up`,
   });
+};
+
+// Get user achievements
+export const getUserAchievements = async (): Promise<Achievement[]> => {
+  try {
+    const response = await makeAuthenticatedRequest<AchievementsResponse>({
+      method: 'GET',
+      url: `/${namespace}/user/achievements`,
+    });
+    return response.data;
+  } catch {
+    // Return mock data if API fails
+    return [
+      {
+        id: 1,
+        title: 'Primera Bruja',
+        description: 'Completa tu primer ritual',
+        icon: '👑',
+        unlocked: true,
+        unlocked_at: '2025-01-15T10:30:00Z',
+        points_awarded: 50,
+      },
+      {
+        id: 2,
+        title: 'Glam Máximo',
+        description: 'Alcanza 1000 puntos de estilo',
+        icon: '💀',
+        unlocked: true,
+        unlocked_at: '2025-01-20T14:20:00Z',
+        points_awarded: 100,
+      },
+      {
+        id: 3,
+        title: 'Trash Queen',
+        description: 'Completa 10 rituales',
+        icon: '✨',
+        unlocked: true,
+        unlocked_at: '2025-02-01T09:15:00Z',
+        points_awarded: 150,
+      },
+      {
+        id: 4,
+        title: 'Rituales Mágicos',
+        description: 'Participa en un evento especial',
+        icon: '🔮',
+        unlocked: false,
+        points_awarded: 200,
+      },
+      {
+        id: 5,
+        title: 'Shopper Supreme',
+        description: 'Realiza 5 compras',
+        icon: '🛍️',
+        unlocked: false,
+        points_awarded: 100,
+      },
+    ];
+  }
+};
+
+// Get user stats
+export const getUserStats = async (): Promise<UserStats> => {
+  try {
+    const response = await makeAuthenticatedRequest<StatsResponse>({
+      method: 'GET',
+      url: `/${namespace}/user/stats`,
+    });
+    return response.data;
+  } catch {
+    // Return mock data if API fails
+    return {
+      total_points_earned: 5420,
+      challenges_completed: 28,
+      achievements_unlocked: 15,
+      days_active: 47,
+      current_streak: 7,
+      total_purchases: 3,
+      total_spent: 89.99,
+    };
+  }
+};
+
+// Get recent activity
+export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog[]> => {
+  try {
+    const response = await makeAuthenticatedRequest<ActivityLogsResponse>({
+      method: 'GET',
+      url: `/${namespace}/user/activity`,
+      params: { limit },
+    });
+    return response.data;
+  } catch {
+    // Return mock data if API fails
+    return [
+      {
+        id: 1,
+        type: 'points',
+        title: 'Compra completada',
+        description: 'Has ganado Pesetrash',
+        amount: 50,
+        currency: 'pesetrash',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        icon: '🪙',
+      },
+      {
+        id: 2,
+        type: 'challenge',
+        title: 'Challenge "Glam Witch"',
+        description: 'Has completado un desafío',
+        amount: 10,
+        currency: 'estampitas',
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        icon: '🃏',
+      },
+      {
+        id: 3,
+        type: 'achievement',
+        title: 'Logro: "Primera Bruja"',
+        description: 'Has desbloqueado un logro',
+        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        icon: '🏆',
+      },
+      {
+        id: 4,
+        type: 'points',
+        title: 'Comentario en blog',
+        description: 'Has ganado Pesetrash',
+        amount: 25,
+        currency: 'pesetrash',
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        icon: '🪙',
+      },
+    ];
+  }
 };
 
 // Prevent unused import warning
