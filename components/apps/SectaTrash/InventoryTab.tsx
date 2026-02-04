@@ -95,14 +95,18 @@ export default function InventoryTab() {
           <span className="text-bubblegum-pink">{currentRank}</span>
         </div>
 
-        {nextRank && (
-          <ProgressBar
-            current={currentPoints}
-            total={nextRankPoints}
-            label={`${currentPoints - (nextRankPoints - (nextRankPoints * progress / 100))} pts para ${nextRank}`}
-            color="magenta"
-          />
-        )}
+        {nextRank && (() => {
+          const pointsEarned = Math.floor(nextRankPoints * progress / 100);
+          const pointsRemaining = nextRankPoints - pointsEarned;
+          return (
+            <ProgressBar
+              current={currentPoints}
+              total={nextRankPoints}
+              label={`${pointsRemaining} pts para ${nextRank}`}
+              color="magenta"
+            />
+          );
+        })()}
 
         {!nextRank && (
           <div className="font-vt323 text-center text-sm text-gray-600">
