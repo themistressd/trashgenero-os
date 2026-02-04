@@ -1,0 +1,136 @@
+/* Glitch Effect */
+.glitch {
+  position: relative;
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: translate(2px, 2px);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: translate(2px, -2px);
+    filter: hue-rotate(360deg);
+  }
+  100% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* Glitch Text Effect with RGB Shift */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-text::before {
+  animation: glitch-text-1 0.6s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  color: #FF00FF;
+  text-shadow: -2px 0 #00FFFF;
+}
+
+.glitch-text::after {
+  animation: glitch-text-2 0.6s infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  color: #00FFFF;
+  text-shadow: -2px 0 #FF00FF;
+}
+
+@keyframes glitch-text-1 {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes glitch-text-2 {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(2px, -2px);
+  }
+  40% {
+    transform: translate(2px, 2px);
+  }
+  60% {
+    transform: translate(-2px, -2px);
+  }
+  80% {
+    transform: translate(-2px, 2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* RGB Chromatic Aberration */
+.chromatic-aberration {
+  position: relative;
+  text-shadow: 
+    2px 0 0 #FF00FF,
+    -2px 0 0 #00FFFF;
+  animation: chromatic-shift 2s ease-in-out infinite;
+}
+
+@keyframes chromatic-shift {
+  0%, 100% {
+    text-shadow: 
+      2px 0 0 #FF00FF,
+      -2px 0 0 #00FFFF;
+  }
+  50% {
+    text-shadow: 
+      -2px 0 0 #FF00FF,
+      2px 0 0 #00FFFF;
+  }
+}
+
+/* Glitch on Hover */
+.glitch-hover:hover {
+  animation: glitch 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+/* Random Glitch (triggered by JS) */
+.glitch-random {
+  animation: glitch 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 3;
+}
