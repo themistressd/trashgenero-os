@@ -10,6 +10,7 @@ import Scanlines from '@/components/effects/Scanlines';
 import StaticNoise from '@/components/effects/StaticNoise';
 import Window from '@/components/desktop/Window';
 import SectaTrash from '@/components/apps/SectaTrash/SectaTrash';
+import Trashtienda from '@/components/apps/Trashtienda/Trashtienda';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import '@/styles/themes/trash-os.css';
 
@@ -125,13 +126,21 @@ export default function DesktopPage() {
               initialPosition={window.position}
               initialSize={window.size}
             >
+              {/* Render Trashtienda component */}
+              {(window.component === 'trashtienda' || window.component === '/apps/trashtienda') && (
+                <Trashtienda />
+              )}
+
               {/* Render SectaTrash component */}
               {(window.component === 'secta-trash' || window.component === '/apps/secta-trash') && (
                 <SectaTrash />
               )}
               
               {/* Default placeholder for other apps */}
-              {window.component !== 'secta-trash' && window.component !== '/apps/secta-trash' && (
+              {window.component !== 'trashtienda' && 
+               window.component !== '/apps/trashtienda' &&
+               window.component !== 'secta-trash' && 
+               window.component !== '/apps/secta-trash' && (
                 <div className="font-vt323 text-lg p-4">
                   <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
                     {window.title}
