@@ -33,6 +33,7 @@ export default function DesktopPage() {
   const [isClient, setIsClient] = useState(false);
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [activeWallpaperId, setActiveWallpaperId] = useState('void');
+  const [recentApps, setRecentApps] = useState<string[]>([]);
 
   const activeWallpaper = useMemo(
     () => WALLPAPERS.find((wallpaper) => wallpaper.id === activeWallpaperId) || WALLPAPERS[0],
@@ -60,6 +61,19 @@ export default function DesktopPage() {
     if (savedWallpaper) {
       setActiveWallpaperId(savedWallpaper);
     }
+
+    const savedRecentApps = localStorage.getItem('desktop-recent-apps');
+    if (savedRecentApps) {
+      try {
+        const parsed = JSON.parse(savedRecentApps);
+        if (Array.isArray(parsed)) {
+          setRecentApps(parsed);
+        }
+      } catch (error) {
+        console.error('Failed to parse recent apps from localStorage:', error);
+        localStorage.removeItem('desktop-recent-apps');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -75,6 +89,12 @@ export default function DesktopPage() {
   const handleIconDoubleClick = (iconId: string) => {
     const icon = DESKTOP_ICONS.find((i) => i.id === iconId);
     if (!icon) return;
+
+    setRecentApps((prev) => {
+      const next = [iconId, ...prev.filter((id) => id !== iconId)].slice(0, 6);
+      localStorage.setItem('desktop-recent-apps', JSON.stringify(next));
+      return next;
+    });
 
     openWindow({
       id: iconId,
@@ -233,6 +253,9 @@ export default function DesktopPage() {
           icons={DESKTOP_ICONS}
           wallpapers={WALLPAPERS}
           activeWallpaperId={activeWallpaperId}
+          recentApps={recentApps
+            .map((id) => DESKTOP_ICONS.find((icon) => icon.id === id))
+            .filter((icon): icon is (typeof DESKTOP_ICONS)[number] => Boolean(icon))}
           onOpenApp={(icon) => handleIconDoubleClick(icon.id)}
           onSelectWallpaper={(wallpaper) => handleSelectWallpaper(wallpaper.id)}
           onClose={() => setIsStartMenuOpen(false)}

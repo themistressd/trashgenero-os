@@ -28,7 +28,7 @@ export default function Taskbar({ windows, onStartClick, onWindowClick }: Taskba
         {windows.map((window) => (
           <button
             key={window.id}
-            className={`taskbar-button ${window.isMinimized ? '' : 'active'}`}
+            className={`taskbar-button ${window.isMinimized ? 'minimized' : 'active'}`}
             onClick={() => onWindowClick(window.id)}
             title={window.title}
           >
