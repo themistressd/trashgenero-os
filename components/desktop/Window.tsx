@@ -56,6 +56,12 @@ export default function Window({
     focusWindow(id);
   };
 
+  const handleTitleDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('button')) return;
+    handleMaximize();
+  };
+
   const handleResizeStart = (event: React.PointerEvent<HTMLDivElement>) => {
     event.stopPropagation();
     if (isMaximized) return;
@@ -75,13 +81,10 @@ export default function Window({
     const handlePointerMove = (event: PointerEvent) => {
       const deltaX = event.clientX - startPointer.current.x;
       const deltaY = event.clientY - startPointer.current.y;
-
       const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : startSize.current.width;
       const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 80 : startSize.current.height;
-
       const nextWidth = Math.max(360, Math.min(maxWidth, startSize.current.width + deltaX));
       const nextHeight = Math.max(240, Math.min(maxHeight, startSize.current.height + deltaY));
-
       updateWindowSize(id, { width: nextWidth, height: nextHeight });
     };
 
@@ -113,7 +116,6 @@ export default function Window({
         };
         const viewportWidth = window.innerWidth;
         const snapThreshold = 40;
-
         if (nextPosition.y <= snapThreshold) {
           setDragHint('maximized');
           return;
@@ -194,11 +196,11 @@ export default function Window({
       {dragHint && (
         <div className={`window-snap-hint ${dragHint}`} aria-hidden="true" />
       )}
-
       {/* Title Bar */}
       <div
         className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-bubblegum-pink px-2 py-1 flex items-center justify-between"
         style={{ cursor: isMaximized ? 'default' : 'move' }}
+        onDoubleClick={handleTitleDoubleClick}
       >
         <span className="flex items-center gap-2">
           <span>{icon}</span>
@@ -209,6 +211,8 @@ export default function Window({
             onClick={handleMinimize}
             className="win95-button px-3 py-0 text-lg leading-none hover:bg-gray-300"
             title="Minimize"
+            aria-label="Minimize window"
+            type="button"
           >
             _
           </button>
@@ -216,13 +220,17 @@ export default function Window({
             onClick={handleMaximize}
             className="win95-button px-3 py-0 text-lg leading-none hover:bg-gray-300"
             title={isMaximized ? 'Restore' : 'Maximize'}
+            aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
+            type="button"
           >
-            □
+            {isMaximized ? '❐' : '□'}
           </button>
           <button
             onClick={handleClose}
             className="win95-button px-3 py-0 text-lg leading-none hover:bg-gray-300"
             title="Close"
+            aria-label="Close window"
+            type="button"
           >
             ×
           </button>

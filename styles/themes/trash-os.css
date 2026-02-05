@@ -244,6 +244,39 @@
   text-align: center;
 }
 
+.taskbar-context {
+  position: fixed;
+  background: var(--win95-gray);
+  border: 2px solid;
+  border-color: var(--win95-white) var(--win95-dark-gray) var(--win95-dark-gray) var(--win95-white);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  padding: 4px;
+  min-width: 160px;
+  z-index: 70;
+}
+
+.taskbar-context-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 4px 8px;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.taskbar-context-item:hover {
+  background: var(--win95-blue);
+  color: var(--win95-white);
+}
+
+.taskbar-context-item.danger:hover {
+  background: #b40000;
+  color: var(--win95-white);
+}
+
 .start-menu {
   position: absolute;
   bottom: 44px;

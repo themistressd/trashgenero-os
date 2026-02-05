@@ -25,7 +25,14 @@ import '@/styles/themes/trash-os.css';
 export default function DesktopPage() {
   const router = useRouter();
   const { hasBooted } = useBootStore();
-  const { windows, openWindow, minimizeWindow, focusWindow } = useWindowStore();
+  const {
+    windows,
+    openWindow,
+    minimizeWindow,
+    maximizeWindow,
+    closeWindow,
+    focusWindow,
+  } = useWindowStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // State for icon positions with localStorage
@@ -246,6 +253,9 @@ export default function DesktopPage() {
           windows={windows}
           onStartClick={handleStartClick}
           onWindowClick={handleTaskbarWindowClick}
+          onWindowMinimize={minimizeWindow}
+          onWindowMaximize={maximizeWindow}
+          onWindowClose={closeWindow}
         />
 
         <StartMenu
