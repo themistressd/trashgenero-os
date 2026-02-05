@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useWindowStore } from '@/lib/store/windowStore';
 
@@ -17,13 +17,23 @@ export default function Window({
   icon,
   children,
 }: WindowProps) {
-  const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, updateWindowPosition, windows } =
-    useWindowStore();
+  const {
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    focusWindow,
+    updateWindowPosition,
+    updateWindowSize,
+    windows,
+  } = useWindowStore();
   const windowData = windows.find((w) => w.id === id);
   
   if (!windowData) return null;
 
   const { isMinimized, isMaximized, zIndex, position, size } = windowData;
+  const [isResizing, setIsResizing] = useState(false);
+  const startPointer = useRef({ x: 0, y: 0 });
+  const startSize = useRef({ width: size.width, height: size.height });
 
   // Don't render if minimized
   if (isMinimized) return null;
@@ -43,6 +53,41 @@ export default function Window({
   const handleMouseDown = () => {
     focusWindow(id);
   };
+
+  const handleResizeStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    if (isMaximized) return;
+    setIsResizing(true);
+    startPointer.current = { x: event.clientX, y: event.clientY };
+    startSize.current = { width: size.width, height: size.height };
+  };
+
+  useEffect(() => {
+    startSize.current = { width: size.width, height: size.height };
+  }, [size.height, size.width]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const deltaX = event.clientX - startPointer.current.x;
+      const deltaY = event.clientY - startPointer.current.y;
+      const nextWidth = Math.max(360, startSize.current.width + deltaX);
+      const nextHeight = Math.max(240, startSize.current.height + deltaY);
+      updateWindowSize(id, { width: nextWidth, height: nextHeight });
+    };
+
+    const handlePointerUp = () => {
+      setIsResizing(false);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [id, isResizing, updateWindowSize]);
 
   return (
     <motion.div
@@ -64,10 +109,39 @@ export default function Window({
       }}
       onDragEnd={(event, info) => {
         if (isMaximized) return;
-        updateWindowPosition(id, {
+        const nextPosition = {
           x: position.x + info.offset.x,
           y: position.y + info.offset.y,
-        });
+        };
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight - 40;
+        const snapThreshold = 40;
+
+        if (nextPosition.y <= snapThreshold) {
+          maximizeWindow(id);
+          return;
+        }
+
+        if (nextPosition.x <= snapThreshold) {
+          updateWindowPosition(id, { x: 0, y: 0 });
+          updateWindowSize(id, {
+            width: Math.floor(viewportWidth / 2),
+            height: viewportHeight,
+          });
+          return;
+        }
+
+        if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
+          updateWindowPosition(id, { x: Math.floor(viewportWidth / 2), y: 0 });
+          updateWindowSize(id, {
+            width: Math.floor(viewportWidth / 2),
+            height: viewportHeight,
+          });
+          return;
+        }
+
+        updateWindowPosition(id, nextPosition);
       }}
       onMouseDown={handleMouseDown}
       style={{
@@ -118,6 +192,12 @@ export default function Window({
       <div className="win95-window-body bg-white overflow-auto" style={{ height: 'calc(100% - 32px)' }}>
         {children}
       </div>
+      {!isMaximized && (
+        <div
+          className="absolute bottom-1 right-1 h-4 w-4 cursor-se-resize border border-gray-600 bg-gray-200"
+          onPointerDown={handleResizeStart}
+        />
+      )}
     </motion.div>
   );
 }
