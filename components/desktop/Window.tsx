@@ -75,10 +75,13 @@ export default function Window({
     const handlePointerMove = (event: PointerEvent) => {
       const deltaX = event.clientX - startPointer.current.x;
       const deltaY = event.clientY - startPointer.current.y;
+
       const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : startSize.current.width;
       const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 80 : startSize.current.height;
+
       const nextWidth = Math.max(360, Math.min(maxWidth, startSize.current.width + deltaX));
       const nextHeight = Math.max(240, Math.min(maxHeight, startSize.current.height + deltaY));
+
       updateWindowSize(id, { width: nextWidth, height: nextHeight });
     };
 
@@ -110,6 +113,7 @@ export default function Window({
         };
         const viewportWidth = window.innerWidth;
         const snapThreshold = 40;
+
         if (nextPosition.y <= snapThreshold) {
           setDragHint('maximized');
           return;
@@ -190,6 +194,7 @@ export default function Window({
       {dragHint && (
         <div className={`window-snap-hint ${dragHint}`} aria-hidden="true" />
       )}
+
       {/* Title Bar */}
       <div
         className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-bubblegum-pink px-2 py-1 flex items-center justify-between"
