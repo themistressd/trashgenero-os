@@ -38,10 +38,10 @@ export const useWindowStore = create<WindowStore>()(
 
       openWindow: (windowData) => {
         const { windows, highestZIndex } = get();
-    
+
         // Check if window already exists
         const existingWindow = windows.find((w) => w.id === windowData.id);
-    
+
         if (existingWindow) {
           // If exists, just focus it
           get().focusWindow(windowData.id);
@@ -67,7 +67,7 @@ export const useWindowStore = create<WindowStore>()(
       closeWindow: (id) => {
         const { windows, activeWindow } = get();
         const newWindows = windows.filter((w) => w.id !== id);
-    
+
         set({
           windows: newWindows,
           activeWindow: activeWindow === id ? (newWindows[0]?.id || null) : activeWindow,
@@ -116,13 +116,13 @@ export const useWindowStore = create<WindowStore>()(
       focusWindow: (id) => {
         const { windows, highestZIndex } = get();
         const window = windows.find((w) => w.id === id);
-    
+
         if (!window) return;
 
         // Normalize z-index if it gets too high
         let newHighestZIndex = highestZIndex + 1;
         let updatedWindows = windows;
-    
+
         if (newHighestZIndex > 10000) {
           // Reset all z-indices while maintaining order
           const sortedWindows = [...windows].sort((a, b) => a.zIndex - b.zIndex);
