@@ -10,6 +10,7 @@ export interface Window {
   position: { x: number; y: number };
   size: { width: number; height: number };
   zIndex: number;
+  restoreState?: { position: { x: number; y: number }; size: { width: number; height: number } };
 }
 
 interface WindowStore {
@@ -22,6 +23,7 @@ interface WindowStore {
   maximizeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   updateWindowPosition: (id: string, position: { x: number; y: number }) => void;
+  updateWindowSize: (id: string, size: { width: number; height: number }) => void;
 }
 
 export const useWindowStore = create<WindowStore>((set, get) => ({
@@ -77,9 +79,29 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
 
   maximizeWindow: (id) => {
     set((state) => ({
-      windows: state.windows.map((w) =>
-        w.id === id ? { ...w, isMaximized: !w.isMaximized } : w
-      ),
+      windows: state.windows.map((w) => {
+        if (w.id !== id) return w;
+        if (!w.isMaximized) {
+          return {
+            ...w,
+            isMaximized: true,
+            restoreState: w.restoreState ?? {
+              position: { ...w.position },
+              size: { ...w.size },
+            },
+          };
+        }
+        if (w.restoreState) {
+          return {
+            ...w,
+            isMaximized: false,
+            position: { ...w.restoreState.position },
+            size: { ...w.restoreState.size },
+            restoreState: undefined,
+          };
+        }
+        return { ...w, isMaximized: false };
+      }),
     }));
   },
 
@@ -118,6 +140,14 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
     set((state) => ({
       windows: state.windows.map((w) =>
         w.id === id ? { ...w, position } : w
+      ),
+    }));
+  },
+
+  updateWindowSize: (id, size) => {
+    set((state) => ({
+      windows: state.windows.map((w) =>
+        w.id === id ? { ...w, size } : w
       ),
     }));
   },
