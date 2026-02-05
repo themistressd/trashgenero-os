@@ -68,6 +68,30 @@
   background: var(--win95-gray);
 }
 
+.window-snap-hint {
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed rgba(255, 0, 255, 0.8);
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(255, 0, 255, 0.35);
+  opacity: 0.9;
+}
+
+.window-snap-hint.left {
+  inset: 6px auto 6px 6px;
+  width: 50%;
+}
+
+.window-snap-hint.right {
+  inset: 6px 6px 6px auto;
+  width: 50%;
+}
+
+.window-snap-hint.maximized {
+  inset: 6px;
+}
+
 /* Windows 95 Input */
 .win95-input {
   background: var(--win95-white);
@@ -94,6 +118,15 @@
   background: var(--void-black);
   position: relative;
   overflow: hidden;
+}
+
+.desktop-wallpaper {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.2);
+  z-index: 0;
 }
 
 /* Icon Styles */
@@ -156,10 +189,204 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .taskbar-button.active {
   border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+}
+
+.taskbar-button.minimized {
+  opacity: 0.8;
+  background: var(--win95-light-gray);
+}
+
+.taskbar-windows {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.taskbar-button-icon {
+  font-size: 16px;
+}
+
+.taskbar-button-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 8px;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+}
+
+.taskbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskbar-clock {
+  border: 2px solid;
+  border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+  padding: 2px 8px;
+  background: var(--win95-light-gray);
+  min-width: 64px;
+  text-align: center;
+}
+
+.start-menu {
+  position: absolute;
+  bottom: 44px;
+  left: 6px;
+  width: 420px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--win95-gray);
+  border: 2px solid;
+  border-color: var(--win95-white) var(--win95-dark-gray) var(--win95-dark-gray) var(--win95-white);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+}
+
+.start-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  color: white;
+  padding: 8px;
+}
+
+.start-menu-logo {
+  font-size: 28px;
+}
+
+.start-menu-title {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  margin: 0;
+}
+
+.start-menu-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+  margin: 0;
+}
+
+.start-menu-section h3 {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--win95-blue);
+}
+
+.start-menu-category {
+  margin-bottom: 12px;
+}
+
+.start-menu-category h4 {
+  margin: 0 0 6px;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  color: #333;
+}
+
+.start-menu-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--win95-white);
+  border: 2px solid;
+  border-color: var(--win95-dark-gray) var(--win95-white) var(--win95-white) var(--win95-dark-gray);
+  padding: 6px 8px;
+  font-family: 'VT323', monospace;
+}
+
+.start-menu-search input {
+  border: none;
+  outline: none;
+  font-family: 'VT323', monospace;
+  width: 100%;
+  background: transparent;
+}
+
+.start-menu-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.start-menu-item {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: var(--win95-light-gray);
+  border: 1px solid var(--win95-dark-gray);
+  font-family: 'VT323', monospace;
+  text-align: left;
+}
+
+.start-menu-item:hover {
+  background: #fff;
+}
+
+.start-menu-item-icon {
+  font-size: 22px;
+}
+
+.start-menu-item small {
+  display: block;
+  color: #555;
+  font-size: 12px;
+}
+
+.start-menu-wallpapers {
+  display: grid;
+  gap: 8px;
+}
+
+.start-menu-wallpaper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid var(--win95-dark-gray);
+  background: var(--win95-light-gray);
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+}
+
+.start-menu-wallpaper-thumb {
+  width: 36px;
+  height: 24px;
+  border: 1px solid #000;
+  background-size: cover;
+  background-position: center;
+}
+
+.start-menu-wallpaper.active {
+  border-color: var(--bubblegum-pink);
+  box-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
+}
+
+.start-menu-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .retro-content h1,
