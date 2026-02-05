@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { DndContext, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBootStore } from '@/lib/store/bootStore';
@@ -31,6 +32,9 @@ export default function DesktopPage() {
     minimizeWindow,
     maximizeWindow,
     closeWindow,
+    updateWindowPosition,
+    updateWindowSize,
+    updateWindowSnap,
     focusWindow,
   } = useWindowStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -131,6 +135,55 @@ export default function DesktopPage() {
     focusWindow(id);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const id = String(event.active.id);
+    focusWindow(id);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, delta } = event;
+    const id = String(active.id);
+    const window = windows.find((item) => item.id === id);
+    if (!window || window.isMaximized) return;
+
+    const nextPosition = {
+      x: window.position.x + delta.x,
+      y: window.position.y + delta.y,
+    };
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 40;
+    const snapThreshold = 40;
+
+    if (nextPosition.y <= snapThreshold) {
+      maximizeWindow(id);
+      return;
+    }
+
+    if (nextPosition.x <= snapThreshold) {
+      updateWindowPosition(id, { x: 0, y: 0 });
+      updateWindowSize(id, {
+        width: Math.floor(viewportWidth / 2),
+        height: viewportHeight,
+      });
+      updateWindowSnap(id, 'left');
+      return;
+    }
+
+    if (nextPosition.x + window.size.width >= viewportWidth - snapThreshold) {
+      updateWindowPosition(id, { x: Math.floor(viewportWidth / 2), y: 0 });
+      updateWindowSize(id, {
+        width: Math.floor(viewportWidth / 2),
+        height: viewportHeight,
+      });
+      updateWindowSnap(id, 'right');
+      return;
+    }
+
+    updateWindowPosition(id, nextPosition);
+    updateWindowSnap(id, null);
+  };
+
   return (
     <CRTScreen turnOn flicker={false}>
       <div
@@ -185,68 +238,70 @@ export default function DesktopPage() {
         </div>
 
         {/* Windows */}
-        <AnimatePresence>
-          {windows.map((window) => (
-            <Window
-              key={window.id}
-              id={window.id}
-              title={window.title}
-              icon={window.icon}
-            >
-              {/* Render Trashtienda component */}
-              {(window.component === 'trashtienda' || window.component === '/apps/trashtienda') && (
-                <Trashtienda />
-              )}
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <AnimatePresence>
+            {windows.map((window) => (
+              <Window
+                key={window.id}
+                id={window.id}
+                title={window.title}
+                icon={window.icon}
+              >
+                {/* Render Trashtienda component */}
+                {(window.component === 'trashtienda' || window.component === '/apps/trashtienda') && (
+                  <Trashtienda />
+                )}
 
-              {/* Render SectaTrash component */}
-              {(window.component === 'secta-trash' || window.component === '/apps/secta-trash') && (
-                <SectaTrash />
-              )}
+                {/* Render SectaTrash component */}
+                {(window.component === 'secta-trash' || window.component === '/apps/secta-trash') && (
+                  <SectaTrash />
+                )}
 
-              {/* Render MistressD component */}
-              {(window.component === 'mistress-d' || window.component === '/apps/mistress-d') && (
-                <MistressD />
-              )}
+                {/* Render MistressD component */}
+                {(window.component === 'mistress-d' || window.component === '/apps/mistress-d') && (
+                  <MistressD />
+                )}
 
-              {/* Render Divas component */}
-              {(window.component === 'divas' || window.component === '/apps/divas') && (
-                <Divas />
-              )}
+                {/* Render Divas component */}
+                {(window.component === 'divas' || window.component === '/apps/divas') && (
+                  <Divas />
+                )}
 
-              {/* Render StalkerZone component */}
-              {(window.component === 'stalker-zone' || window.component === '/apps/stalker-zone') && (
-                <StalkerZone />
-              )}
+                {/* Render StalkerZone component */}
+                {(window.component === 'stalker-zone' || window.component === '/apps/stalker-zone') && (
+                  <StalkerZone />
+                )}
 
-              {/* Render Centerfolds component */}
-              {(window.component === 'centerfolds' || window.component === '/apps/centerfolds') && (
-                <Centerfolds />
-              )}
-              
-              {/* Default placeholder for other apps */}
-              {window.component !== 'trashtienda' && 
-               window.component !== '/apps/trashtienda' &&
-               window.component !== 'secta-trash' && 
-               window.component !== '/apps/secta-trash' &&
-               window.component !== 'mistress-d' && 
-               window.component !== '/apps/mistress-d' &&
-               window.component !== 'divas' && 
-               window.component !== '/apps/divas' &&
-               window.component !== 'stalker-zone' && 
-               window.component !== '/apps/stalker-zone' &&
-               window.component !== 'centerfolds' && 
-               window.component !== '/apps/centerfolds' && (
-                <div className="font-vt323 text-lg p-4">
-                  <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
-                    {window.title}
-                  </h2>
-                  <p className="text-gray-800">Contenido de {window.component}</p>
-                  <p className="text-gray-600 mt-2">Esta ventana es funcional y se puede arrastrar, minimizar, maximizar y cerrar.</p>
-                </div>
-              )}
-            </Window>
-          ))}
-        </AnimatePresence>
+                {/* Render Centerfolds component */}
+                {(window.component === 'centerfolds' || window.component === '/apps/centerfolds') && (
+                  <Centerfolds />
+                )}
+                
+                {/* Default placeholder for other apps */}
+                {window.component !== 'trashtienda' && 
+                 window.component !== '/apps/trashtienda' &&
+                 window.component !== 'secta-trash' && 
+                 window.component !== '/apps/secta-trash' &&
+                 window.component !== 'mistress-d' && 
+                 window.component !== '/apps/mistress-d' &&
+                 window.component !== 'divas' && 
+                 window.component !== '/apps/divas' &&
+                 window.component !== 'stalker-zone' && 
+                 window.component !== '/apps/stalker-zone' &&
+                 window.component !== 'centerfolds' && 
+                 window.component !== '/apps/centerfolds' && (
+                  <div className="font-vt323 text-lg p-4">
+                    <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
+                      {window.title}
+                    </h2>
+                    <p className="text-gray-800">Contenido de {window.component}</p>
+                    <p className="text-gray-600 mt-2">Esta ventana es funcional y se puede arrastrar, minimizar, maximizar y cerrar.</p>
+                  </div>
+                )}
+              </Window>
+            ))}
+          </AnimatePresence>
+        </DndContext>
 
         {/* Taskbar */}
         <Taskbar

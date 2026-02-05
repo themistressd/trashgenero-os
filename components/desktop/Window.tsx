@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useDraggable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
 import { useWindowStore } from '@/lib/store/windowStore';
 
@@ -22,7 +23,6 @@ export default function Window({
     minimizeWindow,
     maximizeWindow,
     focusWindow,
-    updateWindowPosition,
     updateWindowSize,
     updateWindowSnap,
     windows,
@@ -36,6 +36,14 @@ export default function Window({
   const [dragHint, setDragHint] = useState<'left' | 'right' | 'maximized' | null>(null);
   const startPointer = useRef({ x: 0, y: 0 });
   const startSize = useRef({ width: size.width, height: size.height });
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id,
+    disabled: isMaximized,
+  });
+  const dragTransform = useMemo(
+    () => (transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined),
+    [transform]
+  );
 
   // Don't render if minimized
   if (isMinimized) return null;
@@ -100,88 +108,39 @@ export default function Window({
     };
   }, [id, isResizing, updateWindowSize]);
 
+  useEffect(() => {
+    if (!transform || isMaximized) {
+      setDragHint(null);
+      return;
+    }
+    const nextPosition = {
+      x: position.x + transform.x,
+      y: position.y + transform.y,
+    };
+    const viewportWidth = window.innerWidth;
+    const snapThreshold = 40;
+    if (nextPosition.y <= snapThreshold) {
+      setDragHint('maximized');
+      return;
+    }
+    if (nextPosition.x <= snapThreshold) {
+      setDragHint('left');
+      return;
+    }
+    if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
+      setDragHint('right');
+      return;
+    }
+    setDragHint(null);
+  }, [isMaximized, position.x, position.y, size.width, transform]);
+
   return (
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.8, opacity: 0 }}
       transition={{ duration: 0.2 }}
-      drag={!isMaximized}
-      dragMomentum={false}
-      dragElastic={0}
-      onDrag={(event, info) => {
-        const nextPosition = {
-          x: position.x + info.offset.x,
-          y: position.y + info.offset.y,
-        };
-        const viewportWidth = window.innerWidth;
-        const snapThreshold = 40;
-        if (nextPosition.y <= snapThreshold) {
-          setDragHint('maximized');
-          return;
-        }
-        if (nextPosition.x <= snapThreshold) {
-          setDragHint('left');
-          return;
-        }
-        if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
-          setDragHint('right');
-          return;
-        }
-        setDragHint(null);
-      }}
-      dragConstraints={{
-        left: 0,
-        top: 0,
-        right: typeof window !== 'undefined' ? window.innerWidth - (isMaximized ? 0 : size.width) : 0,
-        bottom:
-          typeof window !== 'undefined'
-            ? window.innerHeight - (isMaximized ? 0 : size.height) - 40
-            : 0,
-      }}
-      onDragEnd={(event, info) => {
-        if (isMaximized) return;
-        const nextPosition = {
-          x: position.x + info.offset.x,
-          y: position.y + info.offset.y,
-        };
-
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight - 40;
-        const snapThreshold = 40;
-
-        if (nextPosition.y <= snapThreshold) {
-          maximizeWindow(id);
-          setDragHint(null);
-          return;
-        }
-
-        if (nextPosition.x <= snapThreshold) {
-          updateWindowPosition(id, { x: 0, y: 0 });
-          updateWindowSize(id, {
-            width: Math.floor(viewportWidth / 2),
-            height: viewportHeight,
-          });
-          updateWindowSnap(id, 'left');
-          setDragHint(null);
-          return;
-        }
-
-        if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
-          updateWindowPosition(id, { x: Math.floor(viewportWidth / 2), y: 0 });
-          updateWindowSize(id, {
-            width: Math.floor(viewportWidth / 2),
-            height: viewportHeight,
-          });
-          updateWindowSnap(id, 'right');
-          setDragHint(null);
-          return;
-        }
-
-        updateWindowPosition(id, nextPosition);
-        updateWindowSnap(id, null);
-        setDragHint(null);
-      }}
+      ref={setNodeRef}
       onMouseDown={handleMouseDown}
       style={{
         position: 'fixed',
@@ -190,6 +149,7 @@ export default function Window({
         width: isMaximized ? '100vw' : size.width,
         height: isMaximized ? 'calc(100vh - 40px)' : size.height,
         zIndex,
+        transform: dragTransform,
       }}
       className="win95-window overflow-hidden"
     >
@@ -201,6 +161,8 @@ export default function Window({
         className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-bubblegum-pink px-2 py-1 flex items-center justify-between"
         style={{ cursor: isMaximized ? 'default' : 'move' }}
         onDoubleClick={handleTitleDoubleClick}
+        {...listeners}
+        {...attributes}
       >
         <span className="flex items-center gap-2">
           <span>{icon}</span>
