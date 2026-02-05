@@ -24,6 +24,7 @@ export default function Window({
     focusWindow,
     updateWindowPosition,
     updateWindowSize,
+    updateWindowSnap,
     windows,
   } = useWindowStore();
   const windowData = windows.find((w) => w.id === id);
@@ -57,6 +58,7 @@ export default function Window({
   const handleResizeStart = (event: React.PointerEvent<HTMLDivElement>) => {
     event.stopPropagation();
     if (isMaximized) return;
+    updateWindowSnap(id, null);
     setIsResizing(true);
     startPointer.current = { x: event.clientX, y: event.clientY };
     startSize.current = { width: size.width, height: size.height };
@@ -129,6 +131,7 @@ export default function Window({
             width: Math.floor(viewportWidth / 2),
             height: viewportHeight,
           });
+          updateWindowSnap(id, 'left');
           return;
         }
 
@@ -138,10 +141,12 @@ export default function Window({
             width: Math.floor(viewportWidth / 2),
             height: viewportHeight,
           });
+          updateWindowSnap(id, 'right');
           return;
         }
 
         updateWindowPosition(id, nextPosition);
+        updateWindowSnap(id, null);
       }}
       onMouseDown={handleMouseDown}
       style={{
