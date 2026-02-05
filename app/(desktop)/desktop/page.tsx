@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBootStore } from '@/lib/store/bootStore';
@@ -9,6 +9,9 @@ import CRTScreen from '@/components/effects/CRTScreen';
 import Scanlines from '@/components/effects/Scanlines';
 import StaticNoise from '@/components/effects/StaticNoise';
 import Window from '@/components/desktop/Window';
+import Taskbar from '@/components/desktop/Taskbar';
+import StartMenu from '@/components/desktop/StartMenu';
+import DesktopWallpaper from '@/components/desktop/DesktopWallpaper';
 import SectaTrash from '@/components/apps/SectaTrash/SectaTrash';
 import Trashtienda from '@/components/apps/Trashtienda/Trashtienda';
 import MistressD from '@/components/apps/MistressD/MistressD';
@@ -16,17 +19,25 @@ import Divas from '@/components/apps/Divas/Divas';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
+import { WALLPAPERS } from '@/lib/constants/wallpapers';
 import '@/styles/themes/trash-os.css';
 
 export default function DesktopPage() {
   const router = useRouter();
   const { hasBooted } = useBootStore();
-  const { windows, openWindow } = useWindowStore();
+  const { windows, openWindow, minimizeWindow, focusWindow } = useWindowStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // State for icon positions with localStorage
   const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [isClient, setIsClient] = useState(false);
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
+  const [activeWallpaperId, setActiveWallpaperId] = useState('void');
+
+  const activeWallpaper = useMemo(
+    () => WALLPAPERS.find((wallpaper) => wallpaper.id === activeWallpaperId) || WALLPAPERS[0],
+    [activeWallpaperId]
+  );
 
   useEffect(() => {
     // Set client-side flag and load positions from localStorage
@@ -43,6 +54,11 @@ export default function DesktopPage() {
         console.error('Failed to parse icon positions from localStorage:', error);
         localStorage.removeItem('desktop-icon-positions');
       }
+    }
+
+    const savedWallpaper = localStorage.getItem('desktop-wallpaper');
+    if (savedWallpaper) {
+      setActiveWallpaperId(savedWallpaper);
     }
   }, []);
 
@@ -70,9 +86,31 @@ export default function DesktopPage() {
     });
   };
 
+  const handleStartClick = () => {
+    setIsStartMenuOpen((prev) => !prev);
+  };
+
+  const handleSelectWallpaper = (wallpaperId: string) => {
+    setActiveWallpaperId(wallpaperId);
+    localStorage.setItem('desktop-wallpaper', wallpaperId);
+  };
+
+  const handleTaskbarWindowClick = (id: string) => {
+    const window = windows.find((item) => item.id === id);
+    if (!window) return;
+    if (window.isMinimized) {
+      minimizeWindow(id);
+    }
+    focusWindow(id);
+  };
+
   return (
     <CRTScreen turnOn flicker={false}>
-      <div className="desktop-background relative min-h-screen">
+      <div
+        className="desktop-background relative min-h-screen"
+        onClick={() => setIsStartMenuOpen(false)}
+      >
+        <DesktopWallpaper wallpaper={activeWallpaper} />
         <Scanlines animated />
         <StaticNoise opacity={0.03} intensity="low" />
 
@@ -127,8 +165,6 @@ export default function DesktopPage() {
               id={window.id}
               title={window.title}
               icon={window.icon}
-              initialPosition={window.position}
-              initialSize={window.size}
             >
               {/* Render Trashtienda component */}
               {(window.component === 'trashtienda' || window.component === '/apps/trashtienda') && (
@@ -186,27 +222,21 @@ export default function DesktopPage() {
         </AnimatePresence>
 
         {/* Taskbar */}
-        <div className="taskbar fixed bottom-0 left-0 right-0 z-50">
-          <button className="win95-button flex items-center gap-2">
-            <span className="text-xl">⚡</span>
-            <span className="font-vt323 text-base">Inicio</span>
-          </button>
+        <Taskbar
+          windows={windows}
+          onStartClick={handleStartClick}
+          onWindowClick={handleTaskbarWindowClick}
+        />
 
-          <div className="ml-auto flex items-center gap-2 font-vt323 text-sm">
-            <div className="flex items-center gap-1">
-              <span>🪙</span>
-              <span>0 Pesetrash</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span>🃏</span>
-              <span>0 Estampitas</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span>💎</span>
-              <span>0 Reliquias</span>
-            </div>
-          </div>
-        </div>
+        <StartMenu
+          isOpen={isStartMenuOpen}
+          icons={DESKTOP_ICONS}
+          wallpapers={WALLPAPERS}
+          activeWallpaperId={activeWallpaperId}
+          onOpenApp={(icon) => handleIconDoubleClick(icon.id)}
+          onSelectWallpaper={(wallpaper) => handleSelectWallpaper(wallpaper.id)}
+          onClose={() => setIsStartMenuOpen(false)}
+        />
 
         {/* Welcome Message - Only show when no windows open */}
         {windows.length === 0 && (

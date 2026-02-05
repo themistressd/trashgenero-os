@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useWindowStore } from '@/lib/store/windowStore';
 
@@ -9,8 +9,6 @@ interface WindowProps {
   title: string;
   icon: string;
   children: React.ReactNode;
-  initialPosition?: { x: number; y: number };
-  initialSize?: { width: number; height: number };
 }
 
 export default function Window({
@@ -18,17 +16,14 @@ export default function Window({
   title,
   icon,
   children,
-  initialPosition = { x: 100, y: 100 },
-  initialSize = { width: 600, height: 400 },
 }: WindowProps) {
-  const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, windows } = useWindowStore();
+  const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, updateWindowPosition, windows } =
+    useWindowStore();
   const windowData = windows.find((w) => w.id === id);
   
-  const constraintsRef = useRef(null);
-
   if (!windowData) return null;
 
-  const { isMinimized, isMaximized, zIndex } = windowData;
+  const { isMinimized, isMaximized, zIndex, position, size } = windowData;
 
   // Don't render if minimized
   if (isMinimized) return null;
@@ -61,16 +56,26 @@ export default function Window({
       dragConstraints={{
         left: 0,
         top: 0,
-        right: typeof window !== 'undefined' ? window.innerWidth - (isMaximized ? 0 : windowData.size.width) : 0,
-        bottom: typeof window !== 'undefined' ? window.innerHeight - (isMaximized ? 0 : windowData.size.height) - 40 : 0,
+        right: typeof window !== 'undefined' ? window.innerWidth - (isMaximized ? 0 : size.width) : 0,
+        bottom:
+          typeof window !== 'undefined'
+            ? window.innerHeight - (isMaximized ? 0 : size.height) - 40
+            : 0,
+      }}
+      onDragEnd={(event, info) => {
+        if (isMaximized) return;
+        updateWindowPosition(id, {
+          x: position.x + info.offset.x,
+          y: position.y + info.offset.y,
+        });
       }}
       onMouseDown={handleMouseDown}
       style={{
         position: 'fixed',
-        left: isMaximized ? 0 : initialPosition.x,
-        top: isMaximized ? 0 : initialPosition.y,
-        width: isMaximized ? '100vw' : initialSize.width,
-        height: isMaximized ? 'calc(100vh - 40px)' : initialSize.height,
+        left: isMaximized ? 0 : position.x,
+        top: isMaximized ? 0 : position.y,
+        width: isMaximized ? '100vw' : size.width,
+        height: isMaximized ? 'calc(100vh - 40px)' : size.height,
         zIndex,
       }}
       className="win95-window overflow-hidden"
