@@ -33,6 +33,7 @@ export default function Window({
 
   const { isMinimized, isMaximized, zIndex, position, size } = windowData;
   const [isResizing, setIsResizing] = useState(false);
+  const [dragHint, setDragHint] = useState<'left' | 'right' | 'maximized' | null>(null);
   const startPointer = useRef({ x: 0, y: 0 });
   const startSize = useRef({ width: size.width, height: size.height });
 
@@ -74,8 +75,13 @@ export default function Window({
     const handlePointerMove = (event: PointerEvent) => {
       const deltaX = event.clientX - startPointer.current.x;
       const deltaY = event.clientY - startPointer.current.y;
-      const nextWidth = Math.max(360, startSize.current.width + deltaX);
-      const nextHeight = Math.max(240, startSize.current.height + deltaY);
+
+      const maxWidth = typeof window !== 'undefined' ? window.innerWidth - 40 : startSize.current.width;
+      const maxHeight = typeof window !== 'undefined' ? window.innerHeight - 80 : startSize.current.height;
+
+      const nextWidth = Math.max(360, Math.min(maxWidth, startSize.current.width + deltaX));
+      const nextHeight = Math.max(240, Math.min(maxHeight, startSize.current.height + deltaY));
+
       updateWindowSize(id, { width: nextWidth, height: nextHeight });
     };
 
@@ -100,6 +106,28 @@ export default function Window({
       drag={!isMaximized}
       dragMomentum={false}
       dragElastic={0}
+      onDrag={(event, info) => {
+        const nextPosition = {
+          x: position.x + info.offset.x,
+          y: position.y + info.offset.y,
+        };
+        const viewportWidth = window.innerWidth;
+        const snapThreshold = 40;
+
+        if (nextPosition.y <= snapThreshold) {
+          setDragHint('maximized');
+          return;
+        }
+        if (nextPosition.x <= snapThreshold) {
+          setDragHint('left');
+          return;
+        }
+        if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
+          setDragHint('right');
+          return;
+        }
+        setDragHint(null);
+      }}
       dragConstraints={{
         left: 0,
         top: 0,
@@ -122,6 +150,7 @@ export default function Window({
 
         if (nextPosition.y <= snapThreshold) {
           maximizeWindow(id);
+          setDragHint(null);
           return;
         }
 
@@ -132,6 +161,7 @@ export default function Window({
             height: viewportHeight,
           });
           updateWindowSnap(id, 'left');
+          setDragHint(null);
           return;
         }
 
@@ -142,11 +172,13 @@ export default function Window({
             height: viewportHeight,
           });
           updateWindowSnap(id, 'right');
+          setDragHint(null);
           return;
         }
 
         updateWindowPosition(id, nextPosition);
         updateWindowSnap(id, null);
+        setDragHint(null);
       }}
       onMouseDown={handleMouseDown}
       style={{
@@ -159,6 +191,10 @@ export default function Window({
       }}
       className="win95-window overflow-hidden"
     >
+      {dragHint && (
+        <div className={`window-snap-hint ${dragHint}`} aria-hidden="true" />
+      )}
+
       {/* Title Bar */}
       <div
         className="win95-window-title cursor-move select-none bg-gradient-to-r from-purple-600 to-bubblegum-pink px-2 py-1 flex items-center justify-between"

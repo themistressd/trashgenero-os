@@ -68,6 +68,30 @@
   background: var(--win95-gray);
 }
 
+.window-snap-hint {
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed rgba(255, 0, 255, 0.8);
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(255, 0, 255, 0.35);
+  opacity: 0.9;
+}
+
+.window-snap-hint.left {
+  inset: 6px auto 6px 6px;
+  width: 50%;
+}
+
+.window-snap-hint.right {
+  inset: 6px 6px 6px auto;
+  width: 50%;
+}
+
+.window-snap-hint.maximized {
+  inset: 6px;
+}
+
 /* Windows 95 Input */
 .win95-input {
   background: var(--win95-white);
