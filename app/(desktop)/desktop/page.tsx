@@ -175,17 +175,19 @@ export default function DesktopPage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event;
     const id = String(active.id);
-    const window = windows.find((item) => item.id === id);
-    if (!window || window.isMaximized) return;
+    const windowData = windows.find((item) => item.id === id);
+    if (!windowData || windowData.isMaximized) return;
 
     const nextPosition = {
-      x: window.position.x + delta.x,
-      y: window.position.y + delta.y,
+      x: windowData.position.x + delta.x,
+      y: windowData.position.y + delta.y,
     };
 
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight - 40;
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : windowData.size.width;
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight - 40 : windowData.size.height;
     const snapThreshold = 40;
+    const maxX = Math.max(0, viewportWidth - windowData.size.width);
+    const maxY = Math.max(0, viewportHeight - windowData.size.height);
 
     if (nextPosition.y <= snapThreshold) {
       maximizeWindow(id);
@@ -202,7 +204,7 @@ export default function DesktopPage() {
       return;
     }
 
-    if (nextPosition.x + window.size.width >= viewportWidth - snapThreshold) {
+    if (nextPosition.x + windowData.size.width >= viewportWidth - snapThreshold) {
       updateWindowPosition(id, { x: Math.floor(viewportWidth / 2), y: 0 });
       updateWindowSize(id, {
         width: Math.floor(viewportWidth / 2),
@@ -212,7 +214,11 @@ export default function DesktopPage() {
       return;
     }
 
-    updateWindowPosition(id, nextPosition);
+    const clampedPosition = {
+      x: Math.max(0, Math.min(maxX, nextPosition.x)),
+      y: Math.max(0, Math.min(maxY, nextPosition.y)),
+    };
+    updateWindowPosition(id, clampedPosition);
     updateWindowSnap(id, null);
   };
 
