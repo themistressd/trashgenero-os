@@ -20,6 +20,97 @@
   flex-direction: column;
 }
 
+.trash-mate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 2px solid var(--sidekick-highlight);
+  color: var(--sidekick-text);
+  font-family: 'Pixelify Sans', monospace;
+}
+
+.trash-mate-title {
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.trash-mate-subtitle {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.trash-mate-signal {
+  font-size: 20px;
+}
+
+.trash-mate-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.trash-mate-home {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trash-mate-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+}
+
+.trash-mate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trash-mate-icon-emoji {
+  font-size: 28px;
+}
+
+.trash-mate-app {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.trash-mate-app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--sidekick-text);
+}
+
+.trash-mate-app-title {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.trash-mate-app-subtitle {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.trash-mate-app-body {
+  flex: 1;
+  overflow: auto;
+  border: 2px solid var(--sidekick-highlight);
+  border-radius: 6px;
+  background: #0f0f1f;
+}
+
 /* Game Boy Style Screen */
 .gb-screen {
   background: var(--gb-background);

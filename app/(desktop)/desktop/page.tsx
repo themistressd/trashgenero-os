@@ -29,6 +29,7 @@ import PesetrashWallet from '@/components/apps/PesetrashWallet/PesetrashWallet';
 import Carrito from '@/components/apps/Carrito/Carrito';
 import Ajustes from '@/components/apps/Ajustes/Ajustes';
 import NotificationToaster from '@/components/ui/NotificationToaster';
+import TrashMateShell from '@/components/mobile/TrashMateShell';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
 import { useNotifications } from '@/lib/store/notificationStore';
@@ -60,6 +61,7 @@ export default function DesktopPage() {
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [activeWallpaperId, setActiveWallpaperId] = useState('void');
   const [recentApps, setRecentApps] = useState<string[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   const activeWallpaper = useMemo(
     () => WALLPAPERS.find((wallpaper) => wallpaper.id === activeWallpaperId) || WALLPAPERS[0],
@@ -102,6 +104,17 @@ export default function DesktopPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(event.matches);
+    };
+    handleChange(mediaQuery);
+    const listener = (event: MediaQueryListEvent) => handleChange(event);
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
 
   useEffect(() => {
     // Check if boot sequence should be shown
@@ -111,6 +124,10 @@ export default function DesktopPage() {
       router.push('/bios');
     }
   }, [hasBooted, router]);
+
+  if (isMobile) {
+    return <TrashMateShell />;
+  }
 
   // Handler for double-clicking icons
   const handleIconDoubleClick = (iconId: string) => {
