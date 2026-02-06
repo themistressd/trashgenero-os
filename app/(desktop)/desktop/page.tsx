@@ -186,6 +186,8 @@ export default function DesktopPage() {
     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : windowData.size.width;
     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight - 40 : windowData.size.height;
     const snapThreshold = 40;
+    const maxX = Math.max(0, viewportWidth - windowData.size.width);
+    const maxY = Math.max(0, viewportHeight - windowData.size.height);
 
     if (nextPosition.y <= snapThreshold) {
       maximizeWindow(id);
@@ -212,7 +214,11 @@ export default function DesktopPage() {
       return;
     }
 
-    updateWindowPosition(id, nextPosition);
+    const clampedPosition = {
+      x: Math.max(0, Math.min(maxX, nextPosition.x)),
+      y: Math.max(0, Math.min(maxY, nextPosition.y)),
+    };
+    updateWindowPosition(id, clampedPosition);
     updateWindowSnap(id, null);
   };
 
