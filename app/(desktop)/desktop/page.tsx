@@ -20,6 +20,14 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
+import MiSecta from '@/components/apps/MiSecta/MiSecta';
+import Rituales from '@/components/apps/Rituales/Rituales';
+import Altar from '@/components/apps/Altar/Altar';
+import Grimorio from '@/components/apps/Grimorio/Grimorio';
+import Transmisiones from '@/components/apps/Transmisiones/Transmisiones';
+import PesetrashWallet from '@/components/apps/PesetrashWallet/PesetrashWallet';
+import Carrito from '@/components/apps/Carrito/Carrito';
+import Ajustes from '@/components/apps/Ajustes/Ajustes';
 import NotificationToaster from '@/components/ui/NotificationToaster';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
@@ -301,6 +309,38 @@ export default function DesktopPage() {
                 {(window.component === 'centerfolds' || window.component === '/apps/centerfolds') && (
                   <Centerfolds />
                 )}
+
+                {(window.component === 'mi-secta' || window.component === '/apps/mi-secta') && (
+                  <MiSecta />
+                )}
+
+                {(window.component === 'rituales' || window.component === '/apps/rituales') && (
+                  <Rituales />
+                )}
+
+                {(window.component === 'altar' || window.component === '/apps/altar') && (
+                  <Altar />
+                )}
+
+                {(window.component === 'grimorio' || window.component === '/apps/grimorio') && (
+                  <Grimorio />
+                )}
+
+                {(window.component === 'transmisiones' || window.component === '/apps/transmisiones') && (
+                  <Transmisiones />
+                )}
+
+                {(window.component === 'pesetrash-wallet' || window.component === '/apps/pesetrash-wallet') && (
+                  <PesetrashWallet />
+                )}
+
+                {(window.component === 'carrito' || window.component === '/apps/carrito') && (
+                  <Carrito />
+                )}
+
+                {(window.component === 'ajustes' || window.component === '/apps/ajustes') && (
+                  <Ajustes />
+                )}
                 
                 {/* Default placeholder for other apps */}
                 {window.component !== 'trashtienda' && 
@@ -314,7 +354,23 @@ export default function DesktopPage() {
                  window.component !== 'stalker-zone' && 
                  window.component !== '/apps/stalker-zone' &&
                  window.component !== 'centerfolds' && 
-                 window.component !== '/apps/centerfolds' && (
+                 window.component !== '/apps/centerfolds' &&
+                 window.component !== 'mi-secta' &&
+                 window.component !== '/apps/mi-secta' &&
+                 window.component !== 'rituales' &&
+                 window.component !== '/apps/rituales' &&
+                 window.component !== 'altar' &&
+                 window.component !== '/apps/altar' &&
+                 window.component !== 'grimorio' &&
+                 window.component !== '/apps/grimorio' &&
+                 window.component !== 'transmisiones' &&
+                 window.component !== '/apps/transmisiones' &&
+                 window.component !== 'pesetrash-wallet' &&
+                 window.component !== '/apps/pesetrash-wallet' &&
+                 window.component !== 'carrito' &&
+                 window.component !== '/apps/carrito' &&
+                 window.component !== 'ajustes' &&
+                 window.component !== '/apps/ajustes' && (
                   <div className="font-vt323 text-lg p-4">
                     <h2 className="text-2xl font-bold text-[#FF00FF] mb-4">
                       {window.title}
