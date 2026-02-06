@@ -5,16 +5,25 @@ import { motion } from 'framer-motion';
 import { usePointsHistory, useUserStats, useRecentActivity } from '@/lib/hooks/useGamification';
 
 export default function StatsTab() {
-  const { stats, isLoading: statsLoading } = useUserStats();
-  const { activities, isLoading: activitiesLoading } = useRecentActivity(10);
+  const { stats, isLoading: statsLoading, isError: statsError } = useUserStats();
+  const { activities, isLoading: activitiesLoading, isError: activityError } = useRecentActivity(10);
   const [pointType, setPointType] = React.useState<'pesetrash' | 'estampitas' | 'reliquias'>('pesetrash');
   const [page, setPage] = React.useState(1);
-  const { history, isLoading: historyLoading } = usePointsHistory(pointType, page, 8);
+  const { history, isLoading: historyLoading, isError: historyError } = usePointsHistory(pointType, page, 8);
 
   if (statsLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando estadísticas...</div>
+      </div>
+    );
+  }
+  if (statsError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar las estadísticas.
+        </div>
       </div>
     );
   }
@@ -94,6 +103,10 @@ export default function StatsTab() {
 
         {activitiesLoading ? (
           <div className="font-vt323 text-sm text-gray-600">Cargando actividad...</div>
+        ) : activityError ? (
+          <div className="font-vt323 text-sm text-gray-600">
+            ⚠️ No se pudo cargar la actividad reciente.
+          </div>
         ) : activities.length === 0 ? (
           <div className="font-vt323 text-sm text-gray-600">
             No hay actividad reciente
@@ -159,6 +172,10 @@ export default function StatsTab() {
 
         {historyLoading ? (
           <div className="font-vt323 text-sm text-gray-600">Cargando historial...</div>
+        ) : historyError ? (
+          <div className="font-vt323 text-sm text-gray-600">
+            ⚠️ No se pudo cargar el historial.
+          </div>
         ) : history.length === 0 ? (
           <div className="font-vt323 text-sm text-gray-600">
             No hay movimientos recientes.

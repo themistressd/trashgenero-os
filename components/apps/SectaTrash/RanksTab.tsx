@@ -6,8 +6,8 @@ import { useRanks, useGamification } from '@/lib/hooks/useGamification';
 import RankBadge from './RankBadge';
 
 export default function RanksTab() {
-  const { ranks, isLoading: ranksLoading } = useRanks();
-  const { gamification, isLoading: gamificationLoading } = useGamification();
+  const { ranks, isLoading: ranksLoading, isError: ranksError } = useRanks();
+  const { gamification, isLoading: gamificationLoading, isError: gamificationError } = useGamification();
   const [selectedRank, setSelectedRank] = useState<number | null>(null);
 
   const isLoading = ranksLoading || gamificationLoading;
@@ -16,6 +16,15 @@ export default function RanksTab() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando rangos...</div>
+      </div>
+    );
+  }
+  if (ranksError || gamificationError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar los rangos.
+        </div>
       </div>
     );
   }

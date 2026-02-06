@@ -9,7 +9,7 @@ import RankBadge from './RankBadge';
 import RankUpModal from './RankUpModal';
 
 export default function InventoryTab() {
-  const { gamification, isLoading, refresh } = useGamification();
+  const { gamification, isLoading, isError, refresh } = useGamification();
   const [isRankingUp, setIsRankingUp] = useState(false);
   const [rankUpData, setRankUpData] = useState<{ rankName: string; benefits: string[] } | null>(null);
 
@@ -17,6 +17,15 @@ export default function InventoryTab() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando inventario...</div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudo cargar el inventario. Intenta de nuevo más tarde.
+        </div>
       </div>
     );
   }

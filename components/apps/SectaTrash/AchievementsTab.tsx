@@ -8,7 +8,7 @@ import type { Achievement } from '@/types/gamification';
 type FilterType = 'all' | 'unlocked' | 'locked';
 
 export default function AchievementsTab() {
-  const { achievements, unlocked, locked, isLoading } = useAchievements();
+  const { achievements, unlocked, locked, isLoading, isError } = useAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
   const [query, setQuery] = useState('');
@@ -17,6 +17,15 @@ export default function AchievementsTab() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando logros...</div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar los logros.
+        </div>
       </div>
     );
   }
