@@ -64,9 +64,12 @@ export default function RanksTab() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {isUnlocked ? '✅' : '🔒'}
-                    </span>
+                    <RankBadge
+                      rank={rank.title}
+                      unlocked={isUnlocked}
+                      size="sm"
+                      isCurrentRank={isCurrentRank}
+                    />
                     <div>
                       <div className="font-vt323 text-lg font-bold">
                         {rank.title}

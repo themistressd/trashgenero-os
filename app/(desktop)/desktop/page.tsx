@@ -91,6 +91,7 @@ export default function DesktopPage() {
     }
   }, []);
 
+
   useEffect(() => {
     // Check if boot sequence should be shown
     const enableBootSequence = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
