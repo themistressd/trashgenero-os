@@ -24,6 +24,9 @@ import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
 import '@/styles/themes/trash-os.css';
 
+const ICON_GRID_SIZE = 88;
+const ICON_PADDING = 12;
+
 export default function DesktopPage() {
   const router = useRouter();
   const { hasBooted } = useBootStore();
@@ -146,6 +149,23 @@ export default function DesktopPage() {
     }
   };
 
+  const iconPositionMap = useMemo(
+    () =>
+      DESKTOP_ICONS.reduce<Record<string, { x: number; y: number }>>((acc, icon) => {
+        acc[icon.id] = iconPositions[icon.id] || icon.position;
+        return acc;
+      }, {}),
+    [iconPositions]
+  );
+
+  const occupiedIconKeys = useMemo(() => {
+    const keys = new Set<string>();
+    Object.values(iconPositionMap).forEach((pos) => {
+      keys.add(`${pos.x},${pos.y}`);
+    });
+    return keys;
+  }, [iconPositionMap]);
+
   const handleDragStart = (event: DragStartEvent) => {
     const id = String(event.active.id);
     focusWindow(id);
@@ -208,18 +228,26 @@ export default function DesktopPage() {
         {/* Desktop Icons */}
         <div ref={containerRef} className="relative z-10 p-4 w-full h-full">
           <div className="grid gap-4">
-            {isClient && DESKTOP_ICONS.map((icon) => (
-              <DesktopIcon
-                key={icon.id}
-                id={icon.id}
-                icon={icon.icon}
-                name={icon.name}
-                position={iconPositions[icon.id] || icon.position}
-                containerRef={containerRef}
-                onDoubleClick={handleIconDoubleClick}
-                onPositionChange={handleIconPositionChange}
-              />
-            ))}
+            {isClient && DESKTOP_ICONS.map((icon) => {
+              const currentPosition = iconPositionMap[icon.id];
+              const occupiedKeys = new Set(occupiedIconKeys);
+              occupiedKeys.delete(`${currentPosition.x},${currentPosition.y}`);
+              return (
+                <DesktopIcon
+                  key={icon.id}
+                  id={icon.id}
+                  icon={icon.icon}
+                  name={icon.name}
+                  position={currentPosition}
+                  gridSize={ICON_GRID_SIZE}
+                  padding={ICON_PADDING}
+                  occupiedKeys={occupiedKeys}
+                  containerRef={containerRef}
+                  onDoubleClick={handleIconDoubleClick}
+                  onPositionChange={handleIconPositionChange}
+                />
+              );
+            })}
           </div>
         </div>
 
