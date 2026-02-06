@@ -20,6 +20,7 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
+import XXXperience from '@/components/apps/XXXperience/XXXperience';
 import MiSecta from '@/components/apps/MiSecta/MiSecta';
 import Rituales from '@/components/apps/Rituales/Rituales';
 import Altar from '@/components/apps/Altar/Altar';
@@ -327,6 +328,10 @@ export default function DesktopPage() {
                   <Centerfolds />
                 )}
 
+                {(window.component === 'xxxperience' || window.component === '/apps/xxxperience') && (
+                  <XXXperience />
+                )}
+
                 {(window.component === 'mi-secta' || window.component === '/apps/mi-secta') && (
                   <MiSecta />
                 )}
@@ -372,6 +377,8 @@ export default function DesktopPage() {
                  window.component !== '/apps/stalker-zone' &&
                  window.component !== 'centerfolds' && 
                  window.component !== '/apps/centerfolds' &&
+                 window.component !== 'xxxperience' &&
+                 window.component !== '/apps/xxxperience' &&
                  window.component !== 'mi-secta' &&
                  window.component !== '/apps/mi-secta' &&
                  window.component !== 'rituales' &&
