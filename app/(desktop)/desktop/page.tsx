@@ -20,8 +20,10 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
+import NotificationToaster from '@/components/ui/NotificationToaster';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
+import { useNotifications } from '@/lib/store/notificationStore';
 import '@/styles/themes/trash-os.css';
 
 const ICON_GRID_SIZE = 88;
@@ -41,6 +43,7 @@ export default function DesktopPage() {
     updateWindowSnap,
     focusWindow,
   } = useWindowStore();
+  const notifications = useNotifications();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // State for icon positions with localStorage
@@ -111,6 +114,7 @@ export default function DesktopPage() {
       localStorage.setItem('desktop-recent-apps', JSON.stringify(next));
       return next;
     });
+    notifications.info(`Abriendo ${icon.name}`, 'Inicializando aplicación...');
 
     openWindow({
       id: iconId,
@@ -361,6 +365,7 @@ export default function DesktopPage() {
             </p>
           </div>
         )}
+        <NotificationToaster />
       </div>
     </CRTScreen>
   );
