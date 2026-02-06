@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndContext, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useBootStore } from '@/lib/store/bootStore';
 import { useWindowStore } from '@/lib/store/windowStore';
 import CRTScreen from '@/components/effects/CRTScreen';
@@ -13,6 +13,7 @@ import Window from '@/components/desktop/Window';
 import Taskbar from '@/components/desktop/Taskbar';
 import StartMenu from '@/components/desktop/StartMenu';
 import DesktopWallpaper from '@/components/desktop/DesktopWallpaper';
+import DesktopIcon from '@/components/desktop/DesktopIcon';
 import SectaTrash from '@/components/apps/SectaTrash/SectaTrash';
 import Trashtienda from '@/components/apps/Trashtienda/Trashtienda';
 import MistressD from '@/components/apps/MistressD/MistressD';
@@ -135,6 +136,16 @@ export default function DesktopPage() {
     focusWindow(id);
   };
 
+  const handleIconPositionChange = (id: string, position: { x: number; y: number }) => {
+    const updated = { ...iconPositions, [id]: position };
+    setIconPositions(updated);
+    try {
+      localStorage.setItem('desktop-icon-positions', JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to save icon positions to localStorage:', error);
+    }
+  };
+
   const handleDragStart = (event: DragStartEvent) => {
     const id = String(event.active.id);
     focusWindow(id);
@@ -198,41 +209,16 @@ export default function DesktopPage() {
         <div ref={containerRef} className="relative z-10 p-4 w-full h-full">
           <div className="grid gap-4">
             {isClient && DESKTOP_ICONS.map((icon) => (
-              <motion.div
+              <DesktopIcon
                 key={icon.id}
-                drag
-                dragMomentum={false}
-                dragElastic={0}
-                dragConstraints={containerRef}
-                onDragEnd={(e, info) => {
-                  // info.point gives absolute position on page, we need relative to container
-                  const currentPos = iconPositions[icon.id] || icon.position;
-                  const newPos = {
-                    x: currentPos.x + info.offset.x,
-                    y: currentPos.y + info.offset.y,
-                  };
-                  const updated = { ...iconPositions, [icon.id]: newPos };
-                  setIconPositions(updated);
-                  try {
-                    localStorage.setItem('desktop-icon-positions', JSON.stringify(updated));
-                  } catch (error) {
-                    console.error('Failed to save icon positions to localStorage:', error);
-                  }
-                }}
-                style={{
-                  position: 'absolute',
-                  left: iconPositions[icon.id]?.x || icon.position.x,
-                  top: iconPositions[icon.id]?.y || icon.position.y,
-                }}
-                className="desktop-icon cursor-move"
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  handleIconDoubleClick(icon.id);
-                }}
-              >
-                <div className="desktop-icon-image">{icon.icon}</div>
-                <div className="desktop-icon-name">{icon.name}</div>
-              </motion.div>
+                id={icon.id}
+                icon={icon.icon}
+                name={icon.name}
+                position={iconPositions[icon.id] || icon.position}
+                containerRef={containerRef}
+                onDoubleClick={handleIconDoubleClick}
+                onPositionChange={handleIconPositionChange}
+              />
             ))}
           </div>
         </div>
