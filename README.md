@@ -2,10 +2,10 @@
 
 > **Digital Witchcraft meets Windows 95**
 
-Sistema Operativo de Moda, Culto y Caos - Un sistema operativo web inmersivo construido con Next.js 14, que combina la estética retro de Windows 95 con efectos visuales glitcheados y un sistema de gamificación completo.
+Sistema Operativo de Moda, Culto y Caos - Un sistema operativo web inmersivo construido con Next.js 16, que combina la estética retro de Windows 95 con efectos visuales glitcheados y un sistema de gamificación completo.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-pink)
-![Next.js](https://img.shields.io/badge/Next.js-14.2-black)
+![Next.js](https://img.shields.io/badge/Next.js-16.1-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
 ![License](https://img.shields.io/badge/license-Custom-purple)
 
@@ -27,7 +27,7 @@ Sistema Operativo de Moda, Culto y Caos - Un sistema operativo web inmersivo con
 - **Skip Boot**: Opción de saltar la secuencia en visitas posteriores (localStorage)
 
 ### 🏗️ Arquitectura
-- **Next.js 14 App Router**: Estructura moderna con rutas agrupadas
+- **Next.js 16 App Router**: Estructura moderna con rutas agrupadas
 - **TypeScript**: Tipado completo en todo el proyecto
 - **Zustand**: Gestión de estado global (ventanas, carrito, boot, notificaciones)
 - **SWR**: Data fetching con caché y revalidación automática
