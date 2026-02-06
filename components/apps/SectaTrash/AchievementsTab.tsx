@@ -1,18 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAchievements } from '@/lib/hooks/useGamification';
 import type { Achievement } from '@/types/gamification';
 
+type FilterType = 'all' | 'unlocked' | 'locked';
+
 export default function AchievementsTab() {
-  const { achievements, unlocked, locked, isLoading } = useAchievements();
+  const { achievements, unlocked, locked, isLoading, isError } = useAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [filter, setFilter] = useState<FilterType>('all');
+  const [query, setQuery] = useState('');
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando logros...</div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar los logros.
+        </div>
       </div>
     );
   }
@@ -33,25 +46,69 @@ export default function AchievementsTab() {
     });
   };
 
+  const filteredAchievements = useMemo(() => {
+    const pool =
+      filter === 'unlocked' ? unlocked : filter === 'locked' ? locked : achievements;
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return pool;
+    return pool.filter((achievement) =>
+      `${achievement.title} ${achievement.description}`.toLowerCase().includes(normalized)
+    );
+  }, [achievements, filter, locked, query, unlocked]);
+
+  const grouped = useMemo(() => {
+    return {
+      unlocked: filteredAchievements.filter((achievement) => achievement.unlocked),
+      locked: filteredAchievements.filter((achievement) => !achievement.unlocked),
+    };
+  }, [filteredAchievements]);
+
   return (
     <div className="space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-vcr text-2xl text-bubblegum-pink">
-          🏆 Logros Desbloqueados
-        </h2>
-        <div className="font-vt323 text-lg text-gray-700">
-          {unlocked.length} / {achievements.length}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-vcr text-2xl text-bubblegum-pink">
+            🏆 Logros
+          </h2>
+          <div className="font-vt323 text-sm text-gray-700">
+            {unlocked.length} / {achievements.length} desbloqueados
+          </div>
+        </div>
+        <div className="flex gap-2">
+          {(['all', 'unlocked', 'locked'] as const).map((type) => (
+            <button
+              key={type}
+              className={`win95-button px-3 py-1 text-sm ${
+                filter === type ? 'bg-gray-300' : 'bg-[#dfdfdf]'
+              }`}
+              onClick={() => setFilter(type)}
+            >
+              {type === 'all' && 'Todos'}
+              {type === 'unlocked' && 'Desbloqueados'}
+              {type === 'locked' && 'Bloqueados'}
+            </button>
+          ))}
         </div>
       </div>
 
+      <div className="win95-input flex items-center gap-2 bg-white p-3">
+        <span className="text-lg">🔎</span>
+        <input
+          className="w-full bg-transparent font-vt323 text-sm outline-none"
+          placeholder="Buscar logros..."
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </div>
+
       {/* Unlocked Achievements Grid */}
-      {unlocked.length > 0 && (
+      {grouped.unlocked.length > 0 && (
         <div>
           <h3 className="mb-3 font-vt323 text-lg font-bold text-gray-800">
             ✨ Desbloqueados
           </h3>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {unlocked.map((achievement, index) => (
+            {grouped.unlocked.map((achievement, index) => (
               <motion.div
                 key={achievement.id}
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -78,18 +135,18 @@ export default function AchievementsTab() {
       )}
 
       {/* Locked Achievements */}
-      {locked.length > 0 && (
+      {grouped.locked.length > 0 && (
         <div>
           <h3 className="mb-3 font-vt323 text-lg font-bold text-gray-600">
-            🔒 Bloqueados ({locked.length})
+            🔒 Bloqueados ({grouped.locked.length})
           </h3>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {locked.slice(0, 8).map((achievement, index) => (
+            {grouped.locked.slice(0, 8).map((achievement, index) => (
               <motion.div
                 key={achievement.id}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: (unlocked.length + index) * 0.05 }}
+                transition={{ delay: (grouped.unlocked.length + index) * 0.05 }}
                 onClick={() => handleAchievementClick(achievement)}
                 className="win95-input cursor-pointer bg-gray-100 p-3 grayscale hover:grayscale-0"
                 title={achievement.description}
@@ -106,10 +163,10 @@ export default function AchievementsTab() {
               </motion.div>
             ))}
           </div>
-          {locked.length > 8 && (
+          {grouped.locked.length > 8 && (
             <div className="mt-3 text-center">
               <button className="win95-button px-4 py-2 font-vt323 text-sm">
-                Ver Todos ({locked.length})
+                Ver Todos ({grouped.locked.length})
               </button>
             </div>
           )}
@@ -177,6 +234,15 @@ export default function AchievementsTab() {
           <div className="mb-4 text-6xl">🏆</div>
           <div className="font-vt323 text-lg text-gray-600">
             No hay logros disponibles todavía
+          </div>
+        </div>
+      )}
+
+      {achievements.length > 0 && grouped.unlocked.length === 0 && grouped.locked.length === 0 && (
+        <div className="flex h-40 flex-col items-center justify-center text-center">
+          <div className="mb-2 text-4xl">🕵️‍♀️</div>
+          <div className="font-vt323 text-sm text-gray-600">
+            No hay resultados con esos filtros.
           </div>
         </div>
       )}

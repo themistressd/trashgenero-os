@@ -6,8 +6,8 @@ import { useRanks, useGamification } from '@/lib/hooks/useGamification';
 import RankBadge from './RankBadge';
 
 export default function RanksTab() {
-  const { ranks, isLoading: ranksLoading } = useRanks();
-  const { gamification, isLoading: gamificationLoading } = useGamification();
+  const { ranks, isLoading: ranksLoading, isError: ranksError } = useRanks();
+  const { gamification, isLoading: gamificationLoading, isError: gamificationError } = useGamification();
   const [selectedRank, setSelectedRank] = useState<number | null>(null);
 
   const isLoading = ranksLoading || gamificationLoading;
@@ -19,12 +19,24 @@ export default function RanksTab() {
       </div>
     );
   }
+  if (ranksError || gamificationError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar los rangos.
+        </div>
+      </div>
+    );
+  }
 
   const currentRankId = gamification?.rank?.id;
   const currentPoints = gamification?.points?.pesetrash || 0;
+  const currentRankOrder = gamification?.rank?.order || 0;
 
   // Sort ranks by order
   const sortedRanks = [...ranks].sort((a, b) => a.order - b.order);
+  const maxOrder = sortedRanks[sortedRanks.length - 1]?.order || 1;
+  const rankProgress = Math.min(100, Math.round((currentRankOrder / maxOrder) * 100));
 
   const handleRankClick = (rankId: number) => {
     setSelectedRank(selectedRank === rankId ? null : rankId);
@@ -33,6 +45,62 @@ export default function RanksTab() {
   return (
     <div className="space-y-6 p-4">
       <h2 className="font-vcr text-2xl text-bubblegum-pink">🎖️ Jerarquía de Rangos</h2>
+
+      {/* Rank Roadmap */}
+      <div className="win95-input bg-white p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="font-vt323 text-lg font-bold text-gray-800">🧭 Roadmap de rangos</h3>
+          <span className="font-vt323 text-sm text-gray-600">
+            Progreso: {rankProgress}%
+          </span>
+        </div>
+        {sortedRanks.length === 0 ? (
+          <div className="font-vt323 text-center text-gray-600">
+            No hay rangos disponibles
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="h-2 w-full rounded bg-gray-200">
+              <div
+                className="h-2 rounded bg-bubblegum-pink"
+                style={{ width: `${rankProgress}%` }}
+              />
+            </div>
+            <div className="flex items-center gap-4 overflow-x-auto pb-2">
+              {sortedRanks.map((rank) => {
+                const isUnlocked = rank.order <= currentRankOrder;
+                const isCurrentRank = rank.id === currentRankId;
+                return (
+                  <div
+                    key={rank.id}
+                    className="flex min-w-[160px] flex-col items-center gap-2 text-center"
+                  >
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                        isCurrentRank
+                          ? 'border-bubblegum-pink bg-pink-100'
+                          : isUnlocked
+                          ? 'border-hacker-green bg-green-100'
+                          : 'border-gray-300 bg-gray-100'
+                      }`}
+                    >
+                      <span>{isUnlocked ? '⭐' : '🔒'}</span>
+                    </div>
+                    <div className="font-vt323 text-sm font-bold text-gray-800">
+                      {rank.title}
+                    </div>
+                    {isCurrentRank && (
+                      <div className="rounded bg-bubblegum-pink px-2 py-0.5 font-vt323 text-xs text-white">
+                        Tu rango
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Ranks List */}
       <div className="win95-input space-y-3 bg-white p-4">
@@ -64,9 +132,12 @@ export default function RanksTab() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {isUnlocked ? '✅' : '🔒'}
-                    </span>
+                    <RankBadge
+                      rank={rank.title}
+                      unlocked={isUnlocked}
+                      size="sm"
+                      isCurrentRank={isCurrentRank}
+                    />
                     <div>
                       <div className="font-vt323 text-lg font-bold">
                         {rank.title}

@@ -2,16 +2,28 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useUserStats, useRecentActivity } from '@/lib/hooks/useGamification';
+import { usePointsHistory, useUserStats, useRecentActivity } from '@/lib/hooks/useGamification';
 
 export default function StatsTab() {
-  const { stats, isLoading: statsLoading } = useUserStats();
-  const { activities, isLoading: activitiesLoading } = useRecentActivity(10);
+  const { stats, isLoading: statsLoading, isError: statsError } = useUserStats();
+  const { activities, isLoading: activitiesLoading, isError: activityError } = useRecentActivity(10);
+  const [pointType, setPointType] = React.useState<'pesetrash' | 'estampitas' | 'reliquias'>('pesetrash');
+  const [page, setPage] = React.useState(1);
+  const { history, isLoading: historyLoading, isError: historyError } = usePointsHistory(pointType, page, 8);
 
   if (statsLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando estadísticas...</div>
+      </div>
+    );
+  }
+  if (statsError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar las estadísticas.
+        </div>
       </div>
     );
   }
@@ -91,6 +103,10 @@ export default function StatsTab() {
 
         {activitiesLoading ? (
           <div className="font-vt323 text-sm text-gray-600">Cargando actividad...</div>
+        ) : activityError ? (
+          <div className="font-vt323 text-sm text-gray-600">
+            ⚠️ No se pudo cargar la actividad reciente.
+          </div>
         ) : activities.length === 0 ? (
           <div className="font-vt323 text-sm text-gray-600">
             No hay actividad reciente
@@ -126,6 +142,88 @@ export default function StatsTab() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Points History */}
+      <div className="win95-input bg-white p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="font-vt323 text-lg font-bold text-gray-800">
+            🧾 Historial de puntos
+          </h3>
+          <div className="flex gap-2">
+            {(['pesetrash', 'estampitas', 'reliquias'] as const).map((type) => (
+              <button
+                key={type}
+                className={`win95-button px-3 py-1 text-sm ${
+                  pointType === type ? 'bg-gray-300' : 'bg-[#dfdfdf]'
+                }`}
+                onClick={() => {
+                  setPointType(type);
+                  setPage(1);
+                }}
+              >
+                {type === 'pesetrash' && '🪙'}
+                {type === 'estampitas' && '🃏'}
+                {type === 'reliquias' && '💎'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {historyLoading ? (
+          <div className="font-vt323 text-sm text-gray-600">Cargando historial...</div>
+        ) : historyError ? (
+          <div className="font-vt323 text-sm text-gray-600">
+            ⚠️ No se pudo cargar el historial.
+          </div>
+        ) : history.length === 0 ? (
+          <div className="font-vt323 text-sm text-gray-600">
+            No hay movimientos recientes.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {history.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-center justify-between border-b border-gray-200 pb-2 font-vt323 text-sm"
+              >
+                <div>
+                  <div className="font-bold text-gray-800">{entry.description}</div>
+                  <div className="text-xs text-gray-600">{formatTimestamp(entry.date)}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-base font-bold text-purple-600">
+                    {entry.points > 0 ? '+' : ''}
+                    {entry.points}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {pointType === 'pesetrash' && '🪙 Pesetrash'}
+                    {pointType === 'estampitas' && '🃏 Estampitas'}
+                    {pointType === 'reliquias' && '💎 Reliquias'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-3 flex items-center justify-between">
+          <button
+            className="win95-button px-3 py-1 text-sm"
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            disabled={page === 1}
+          >
+            ◀ Anterior
+          </button>
+          <span className="font-vt323 text-xs text-gray-600">Página {page}</span>
+          <button
+            className="win95-button px-3 py-1 text-sm"
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={history.length < 8}
+          >
+            Siguiente ▶
+          </button>
+        </div>
       </div>
     </div>
   );

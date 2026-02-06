@@ -1,17 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { rankUpUser } from '@/lib/api/gamification';
 import { useGamification } from '@/lib/hooks/useGamification';
 import ProgressBar from './ProgressBar';
+import RankBadge from './RankBadge';
+import RankUpModal from './RankUpModal';
 
 export default function InventoryTab() {
-  const { gamification, isLoading } = useGamification();
+  const { gamification, isLoading, isError, refresh } = useGamification();
+  const [isRankingUp, setIsRankingUp] = useState(false);
+  const [rankUpData, setRankUpData] = useState<{ rankName: string; benefits: string[] } | null>(null);
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="font-vt323 text-lg text-gray-600">Cargando inventario...</div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudo cargar el inventario. Intenta de nuevo más tarde.
+        </div>
       </div>
     );
   }
@@ -22,6 +36,28 @@ export default function InventoryTab() {
   const progress = gamification?.progress_to_next || 0;
   const currentPoints = points.pesetrash;
   const nextRankPoints = gamification?.next_rank?.requirements?.[0]?.points_required || 0;
+  const canRankUp = Boolean(gamification?.can_rank_up);
+
+  const handleRankUp = async () => {
+    if (isRankingUp) return;
+    setIsRankingUp(true);
+    try {
+      const result = await rankUpUser();
+      await refresh();
+      setRankUpData({
+        rankName: result.new_rank.title,
+        benefits: [
+          'Acceso a contenido exclusivo del rango',
+          'Badge especial para tu perfil',
+          'Descuentos especiales en Trashtienda',
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to rank up:', error);
+    } finally {
+      setIsRankingUp(false);
+    }
+  };
 
   return (
     <div className="space-y-6 p-4">
@@ -92,7 +128,7 @@ export default function InventoryTab() {
         <div className="flex items-center gap-2 font-vt323 text-lg">
           <span>🎖️</span>
           <span className="font-bold">Rango Actual:</span>
-          <span className="text-bubblegum-pink">{currentRank}</span>
+          <RankBadge rank={currentRank} unlocked size="md" isCurrentRank />
         </div>
 
         {nextRank && (() => {
@@ -113,6 +149,21 @@ export default function InventoryTab() {
             ¡Has alcanzado el rango máximo! 👑
           </div>
         )}
+
+        {canRankUp && (
+          <div className="flex items-center justify-between gap-4 rounded border-2 border-bubblegum-pink bg-pink-50 p-3">
+            <div className="font-vt323 text-sm text-gray-700">
+              ✨ ¡Puedes subir de rango ahora!
+            </div>
+            <button
+              className="win95-button px-4 py-2 font-vt323 text-sm"
+              onClick={handleRankUp}
+              disabled={isRankingUp}
+            >
+              {isRankingUp ? 'Ascendiendo...' : 'Subir de rango'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info Box */}
@@ -124,6 +175,13 @@ export default function InventoryTab() {
           drops limitados.
         </p>
       </div>
+
+      <RankUpModal
+        isOpen={Boolean(rankUpData)}
+        onClose={() => setRankUpData(null)}
+        rankName={rankUpData?.rankName || ''}
+        benefits={rankUpData?.benefits || []}
+      />
     </div>
   );
 }
