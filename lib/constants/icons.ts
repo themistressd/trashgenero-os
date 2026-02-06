@@ -29,12 +29,20 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
     position: { x: 20, y: 260 },
   },
   {
+    id: 'xxxperience',
+    name: 'XXXperience.zip',
+    icon: '🎯',
+    route: '/apps/xxxperience',
+    description: 'Mini-juegos rituales y challenges interactivos.',
+    position: { x: 20, y: 380 },
+  },
+  {
     id: 'centerfolds',
     name: 'CENTERFOLDS.zip',
     icon: '📌',
     route: '/apps/centerfolds',
     description: 'Lookbooks, editoriales y archivo visual.',
-    position: { x: 20, y: 380 },
+    position: { x: 20, y: 500 },
   },
   {
     id: 'trashtienda',

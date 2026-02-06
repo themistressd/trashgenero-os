@@ -162,6 +162,9 @@ export const playSound = (id: string, options?: { volume?: number }): void => {
   const enableSounds = process.env.NEXT_PUBLIC_ENABLE_SOUNDS !== 'false';
   if (!enableSounds) return;
 
+  const persistedPreference = localStorage.getItem('trash-os-sounds');
+  if (persistedPreference === 'false') return;
+
   const sound = getSoundById(id);
   if (!sound) return;
 
