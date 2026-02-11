@@ -90,6 +90,22 @@ export default function TrashMateShell() {
 
   const activeApp = apps.find((app) => app.id === activeAppId) ?? apps[0];
 
+  const userRank = gamification?.rank?.slug;
+  const appAccessMap = useMemo(
+    () =>
+      Object.fromEntries(
+        apps.map((app) => {
+          const canOpen = canAccessRoute(app.route, userRank);
+          const route = getRouteByPath(app.route);
+          const requiredRankLabel = route?.requiredRank
+            ? getRankNameBySlug(route.requiredRank)
+            : undefined;
+          return [app.id, { canOpen, requiredRankLabel }];
+        })
+      ),
+    [apps, userRank]
+  );
+
   const openApp = (id: string) => {
     const app = apps.find((item) => item.id === id);
     if (!app) return;
@@ -143,8 +159,16 @@ export default function TrashMateShell() {
                   className="trash-mate-icon"
                   onClick={() => openApp(app.id)}
                 >
-                  <span className="trash-mate-icon-emoji">{app.icon}</span>
+                  <span className="trash-mate-icon-emoji">
+                    {app.icon}
+                    {!appAccessMap[app.id]?.canOpen && <span className="ml-1 text-xs">🔒</span>}
+                  </span>
                   <span className="trash-mate-icon-label">{app.name}</span>
+                  {!appAccessMap[app.id]?.canOpen && appAccessMap[app.id]?.requiredRankLabel && (
+                    <span className="mt-1 font-vt323 text-[10px] text-[#7c2d12]">
+                      Req: {appAccessMap[app.id].requiredRankLabel}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

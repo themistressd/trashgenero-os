@@ -95,6 +95,24 @@ export default function DesktopPage() {
     return window.matchMedia('(max-width: 768px)').matches;
   });
 
+
+  const userRank = gamification?.rank?.slug;
+
+  const iconAccessMap = useMemo(
+    () =>
+      Object.fromEntries(
+        DESKTOP_ICONS.map((icon) => {
+          const canOpen = icon.route ? canAccessRoute(icon.route, userRank) : true;
+          const route = icon.route ? getRouteByPath(icon.route) : undefined;
+          const lockLabel = route?.requiredRank
+            ? `Req: ${getRankNameBySlug(route.requiredRank)}`
+            : undefined;
+          return [icon.id, { canOpen, lockLabel }];
+        })
+      ),
+    [userRank]
+  );
+
   const activeWallpaper = useMemo(
     () => WALLPAPERS.find((wallpaper) => wallpaper.id === activeWallpaperId) || WALLPAPERS[0],
     [activeWallpaperId]
@@ -122,7 +140,6 @@ export default function DesktopPage() {
     const icon = DESKTOP_ICONS.find((i) => i.id === iconId);
     if (!icon) return;
 
-    const userRank = gamification?.rank?.slug;
     const canOpen = icon.route ? canAccessRoute(icon.route, userRank) : true;
     if (!canOpen) {
       const route = icon.route ? getRouteByPath(icon.route) : undefined;
@@ -287,6 +304,8 @@ export default function DesktopPage() {
                   containerRef={containerRef}
                   onDoubleClick={handleIconDoubleClick}
                   onPositionChange={handleIconPositionChange}
+                  locked={!iconAccessMap[icon.id]?.canOpen}
+                  lockLabel={iconAccessMap[icon.id]?.lockLabel}
                 />
               );
             })}

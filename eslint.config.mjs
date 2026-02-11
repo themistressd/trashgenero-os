@@ -7,9 +7,10 @@ const config = [
   {
     rules: {
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@next/next/no-page-custom-font': 'warn',
+      '@next/next/no-page-custom-font': 'off',
     },
   },
 ];
+
 
 export default config;
