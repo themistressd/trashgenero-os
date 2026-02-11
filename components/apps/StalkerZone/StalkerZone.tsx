@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SOCIAL_LINKS } from '@/lib/constants/socialLinks';
 
 type TabKey = 'instagram' | 'tiktok' | 'onlyfans' | 'twitter';
+type DataSource = 'live' | 'mock';
 
 interface InstagramPost {
   id: string;
@@ -89,12 +90,16 @@ export default function StalkerZone() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+  const [dataSource, setDataSource] = useState<DataSource>('mock');
 
-  const fetchInstagram = useCallback(async () => {
+  const fetchInstagram = useCallback(async (signal?: AbortSignal) => {
+    let wasAborted = false;
+
     try {
       setIsLoading(true);
       const response = await fetch('https://www.instagram.com/trashgnero/?__a=1&__d=dis', {
         cache: 'no-store',
+        signal,
       });
       if (!response.ok) throw new Error('Instagram API error');
       const data = await response.json();
@@ -115,20 +120,31 @@ export default function StalkerZone() {
         description: user?.biography || mockProfile.description,
       });
 
-      setPosts(fetchedPosts.length > 0 ? fetchedPosts : mockPosts);
+      const useMock = fetchedPosts.length === 0;
+      setPosts(useMock ? mockPosts : fetchedPosts);
+      setDataSource(useMock ? 'mock' : 'live');
       setHasError(false);
-    } catch {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        wasAborted = true;
+        return;
+      }
       setPosts(mockPosts);
       setProfile(mockProfile);
+      setDataSource('mock');
       setHasError(true);
     } finally {
+      if (wasAborted) return;
       setIsLoading(false);
       setLastUpdatedAt(new Date());
     }
   }, []);
 
   useEffect(() => {
-    fetchInstagram();
+    const controller = new AbortController();
+    fetchInstagram(controller.signal);
+
+    return () => controller.abort();
   }, [fetchInstagram]);
 
   const socialButtons = useMemo(
@@ -183,13 +199,16 @@ export default function StalkerZone() {
               <div className="text-right font-vt323 text-sm text-gray-600">
                 <div>Followers</div>
                 <div className="text-lg text-bubblegum-pink">{profile.followers}</div>
+                <div className={`mt-1 font-vt323 text-[10px] ${dataSource === 'live' ? 'text-green-700' : 'text-amber-700'}`}>
+                  Fuente: {dataSource === 'live' ? 'LIVE' : 'MOCK'}
+                </div>
                 <button
                   type="button"
                   className="mt-2 win95-button px-2 py-1 text-[11px]"
-                  onClick={fetchInstagram}
+                  onClick={() => fetchInstagram()}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Cargando...' : 'Reintentar sync'}
+                  {isLoading ? 'Sincronizando...' : 'Sincronizar ahora'}
                 </button>
               </div>
             </div>
