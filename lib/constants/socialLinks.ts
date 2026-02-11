@@ -9,18 +9,18 @@ export const SOCIAL_LINKS = [
     id: 'tiktok',
     label: 'TikTok',
     icon: '🎵',
-    href: '#',
+    href: 'https://www.tiktok.com/@trashgnero',
   },
   {
     id: 'onlyfans',
     label: 'OnlyFans',
     icon: '🔥',
-    href: '#',
+    href: 'https://onlyfans.com/trashgnero',
   },
   {
     id: 'twitter',
     label: 'Twitter',
     icon: '🐦',
-    href: '#',
+    href: 'https://x.com/trashgnero',
   },
 ];
