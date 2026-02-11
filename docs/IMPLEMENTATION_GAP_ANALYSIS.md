@@ -1,6 +1,6 @@
 # Análisis de avance vs plan de implementación
 
-Fecha: 2026-02-11
+Fecha: 2026-02-11 (actualizado)
 
 ## Resumen ejecutivo
 
@@ -9,6 +9,12 @@ El repositorio ya cubre la mayor parte de las fases 1-7 y una parte importante d
 - **Completado / muy avanzado**: Setup base, core técnico, efectos visuales, boot sequence, shell desktop, sistema de ventanas, iconos desktop, base responsive móvil.
 - **Parcial**: Apps de gamificación/e-commerce/contenido/interactive (varias listas, UIs y datos mock están implementadas, pero todavía hay integraciones o flujos incompletos).
 - **Pendiente principal**: Pulido final (QA, performance, accesibilidad avanzada) e integración real de algunos módulos que aún muestran fallback/"próximamente".
+
+Validación rápida local ejecutada en este corte:
+
+- `npm run lint` ✅
+- `npm run type-check` ✅
+- `npm run build` ✅
 
 ## Estado por fase
 
@@ -44,7 +50,7 @@ El repositorio ya cubre la mayor parte de las fases 1-7 y una parte importante d
 
 - Componente Window base + manager + z-index + min/max/close implementados (`components/desktop/Window.tsx`, `lib/store/windowStore.ts`, `lib/hooks/useWindowManager.ts`).
 - Drag & drop con `@dnd-kit` activo en el desktop (`app/(desktop)/desktop/page.tsx`).
-- Pendiente menor: reglas de permisos por rango en rutas todavía con TODO (`lib/constants/routes.ts`).
+- Regla de permisos por rango implementada en `canAccessRoute` (`lib/constants/routes.ts`).
 
 ## Fase 7: Desktop Icons 📂 — **Completada**
 
@@ -92,6 +98,5 @@ El repositorio ya cubre la mayor parte de las fases 1-7 y una parte importante d
 1. **Cerrar integraciones reales** (GamiPress/WooCommerce/WordPress Auth) sin depender de mock.
 2. **Completar apps interactivas** eliminando estados “coming soon” donde aplique.
 3. **Definir y/o mapear apps faltantes del plan original** (especialmente video player/blog naming).
-4. **Implementar reglas de acceso por rango** (TODO en `canAccessRoute`).
+4. **Expandir cobertura funcional mobile** para apps clave (paridad desktop ↔ mobile).
 5. **Polish final**: accesibilidad, performance budgets, suite de testing y pipeline CI.
-6. **Corregir script de lint** para Next.js 16 (actualmente falla con `next lint`).
