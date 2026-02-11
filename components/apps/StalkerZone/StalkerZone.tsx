@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SOCIAL_LINKS } from '@/lib/constants/socialLinks';
 
@@ -196,7 +197,7 @@ export default function StalkerZone() {
                       className="text-left transition hover:opacity-90"
                     >
                       <div className="h-28 w-full overflow-hidden bg-gray-100">
-                        <img src={post.image} alt={post.caption} className="h-full w-full object-cover" />
+                        <Image src={post.image} alt={post.caption} className="h-full w-full object-cover" width={320} height={180} unoptimized />
                       </div>
                       <div className="mt-2 font-vt323 text-xs text-gray-700 line-clamp-2">
                         {post.caption}
