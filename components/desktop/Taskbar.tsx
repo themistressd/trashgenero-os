@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Window } from '@/lib/store/windowStore';
 import Clock from './Clock';
 
@@ -21,13 +21,11 @@ export default function Taskbar({
   onWindowMaximize,
   onWindowClose,
 }: TaskbarProps) {
-  const menuRef = useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useState<{
     id: string;
     x: number;
     y: number;
   } | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!menu) return;
@@ -41,26 +39,6 @@ export default function Taskbar({
       window.removeEventListener('click', handleClick);
       window.removeEventListener('keydown', handleEscape);
     };
-  }, [menu]);
-
-  useLayoutEffect(() => {
-    if (!menu || !menuRef.current) return;
-    const { innerWidth, innerHeight } = window;
-    const { offsetWidth, offsetHeight } = menuRef.current;
-    const padding = 8;
-    let nextX = menu.x;
-    let nextY = menu.y;
-
-    if (nextX + offsetWidth + padding > innerWidth) {
-      nextX = innerWidth - offsetWidth - padding;
-    }
-    if (nextY + offsetHeight + padding > innerHeight) {
-      nextY = innerHeight - offsetHeight - padding;
-    }
-
-    nextX = Math.max(padding, nextX);
-    nextY = Math.max(padding, nextY);
-    setMenuPosition({ x: nextX, y: nextY });
   }, [menu]);
 
   const activeWindow = menu ? windows.find((window) => window.id === menu.id) : null;
@@ -87,7 +65,6 @@ export default function Taskbar({
             onContextMenu={(event) => {
               event.preventDefault();
               setMenu({ id: window.id, x: event.clientX, y: event.clientY });
-              setMenuPosition(null);
             }}
             title={window.title}
           >
@@ -99,11 +76,10 @@ export default function Taskbar({
 
       {menu && activeWindow && (
         <div
-          ref={menuRef}
           className="taskbar-context"
           style={{
-            left: menuPosition?.x ?? menu.x,
-            top: menuPosition?.y ?? menu.y,
+            left: menu.x,
+            top: menu.y,
           }}
           role="menu"
         >

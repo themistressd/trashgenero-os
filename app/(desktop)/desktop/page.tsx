@@ -57,12 +57,39 @@ export default function DesktopPage() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // State for icon positions with localStorage
-  const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>({});
-  const [isClient, setIsClient] = useState(false);
+  const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('desktop-icon-positions');
+    if (!saved) return {};
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      localStorage.removeItem('desktop-icon-positions');
+      return {};
+    }
+  });
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
-  const [activeWallpaperId, setActiveWallpaperId] = useState('void');
-  const [recentApps, setRecentApps] = useState<string[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const [activeWallpaperId, setActiveWallpaperId] = useState(() => {
+    if (typeof window === 'undefined') return 'void';
+    return localStorage.getItem('desktop-wallpaper') || 'void';
+  });
+  const [recentApps, setRecentApps] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    const saved = localStorage.getItem('desktop-recent-apps');
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      localStorage.removeItem('desktop-recent-apps');
+      return [];
+    }
+  });
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 768px)').matches;
+  });
 
   const activeWallpaper = useMemo(
     () => WALLPAPERS.find((wallpaper) => wallpaper.id === activeWallpaperId) || WALLPAPERS[0],
@@ -70,49 +97,9 @@ export default function DesktopPage() {
   );
 
   useEffect(() => {
-    // Set client-side flag and load positions from localStorage
-    setIsClient(true);
-    const saved = localStorage.getItem('desktop-icon-positions');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Validate structure
-        if (parsed && typeof parsed === 'object') {
-          setIconPositions(parsed);
-        }
-      } catch (error) {
-        console.error('Failed to parse icon positions from localStorage:', error);
-        localStorage.removeItem('desktop-icon-positions');
-      }
-    }
-
-    const savedWallpaper = localStorage.getItem('desktop-wallpaper');
-    if (savedWallpaper) {
-      setActiveWallpaperId(savedWallpaper);
-    }
-
-    const savedRecentApps = localStorage.getItem('desktop-recent-apps');
-    if (savedRecentApps) {
-      try {
-        const parsed = JSON.parse(savedRecentApps);
-        if (Array.isArray(parsed)) {
-          setRecentApps(parsed);
-        }
-      } catch (error) {
-        console.error('Failed to parse recent apps from localStorage:', error);
-        localStorage.removeItem('desktop-recent-apps');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(max-width: 768px)');
-    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(event.matches);
-    };
-    handleChange(mediaQuery);
-    const listener = (event: MediaQueryListEvent) => handleChange(event);
+    const listener = (event: MediaQueryListEvent) => setIsMobile(event.matches);
     mediaQuery.addEventListener('change', listener);
     return () => mediaQuery.removeEventListener('change', listener);
   }, []);
@@ -125,10 +112,6 @@ export default function DesktopPage() {
       router.push('/bios');
     }
   }, [hasBooted, router]);
-
-  if (isMobile) {
-    return <TrashMateShell />;
-  }
 
   // Handler for double-clicking icons
   const handleIconDoubleClick = (iconId: string) => {
@@ -252,6 +235,10 @@ export default function DesktopPage() {
     updateWindowSnap(id, null);
   };
 
+  if (isMobile) {
+    return <TrashMateShell />;
+  }
+
   return (
     <CRTScreen turnOn flicker={false}>
       <div
@@ -265,7 +252,7 @@ export default function DesktopPage() {
         {/* Desktop Icons */}
         <div ref={containerRef} className="relative z-10 p-4 w-full h-full">
           <div className="grid gap-4">
-            {isClient && DESKTOP_ICONS.map((icon) => {
+            {DESKTOP_ICONS.map((icon) => {
               const currentPosition = iconPositionMap[icon.id];
               const occupiedKeys = new Set(occupiedIconKeys);
               occupiedKeys.delete(`${currentPosition.x},${currentPosition.y}`);
