@@ -7,6 +7,7 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
+import XXXperience from '@/components/apps/XXXperience/XXXperience';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
 import { getRankNameBySlug } from '@/lib/constants/ranks';
@@ -77,6 +78,14 @@ export default function TrashMateShell() {
         description: 'Social y transmisiones.',
         route: '/apps/stalker-zone',
         component: <StalkerZone />,
+      },
+      {
+        id: 'xxxperience',
+        name: 'XXXperience.zip',
+        icon: '🕹️',
+        description: 'Mini-juegos rituales.',
+        route: '/apps/xxxperience',
+        component: <XXXperience />,
       },
     ],
     []
@@ -220,6 +229,14 @@ export default function TrashMateShell() {
         >
           <span>👾</span>
           <span>Social</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'xxxperience' ? 'active' : ''}`}
+          onClick={() => openApp('xxxperience')}
+        >
+          <span>🕹️</span>
+          <span>Play</span>
         </button>
       </nav>
     </div>
