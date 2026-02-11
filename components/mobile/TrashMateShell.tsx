@@ -7,6 +7,9 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
+import { useGamification } from '@/lib/hooks/useGamification';
+import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
+import { getRankNameBySlug } from '@/lib/constants/ranks';
 
 type TrashMateView = 'home' | 'app';
 
@@ -15,12 +18,15 @@ interface TrashMateApp {
   name: string;
   icon: string;
   description: string;
+  route: string;
   component: React.ReactNode;
 }
 
 export default function TrashMateShell() {
   const [view, setView] = useState<TrashMateView>('home');
   const [activeAppId, setActiveAppId] = useState<string>('secta-trash');
+  const [lockMessage, setLockMessage] = useState<string>('');
+  const { gamification } = useGamification();
 
   const apps = useMemo<TrashMateApp[]>(
     () => [
@@ -29,6 +35,7 @@ export default function TrashMateShell() {
         name: 'SectaTrash.exe',
         icon: '🎮',
         description: 'Perfil, rangos y puntos.',
+        route: '/apps/secta-trash',
         component: <SectaTrash />,
       },
       {
@@ -36,6 +43,7 @@ export default function TrashMateShell() {
         name: 'Trashtienda.exe',
         icon: '🛍️',
         description: 'Compras y drops rituales.',
+        route: '/apps/trashtienda',
         component: <Trashtienda />,
       },
       {
@@ -43,6 +51,7 @@ export default function TrashMateShell() {
         name: 'Mistress D.exe',
         icon: '📝',
         description: 'Archivo personal y manifiesto.',
+        route: '/apps/mistress-d',
         component: <MistressD />,
       },
       {
@@ -50,6 +59,7 @@ export default function TrashMateShell() {
         name: 'Divas.rar',
         icon: '💿',
         description: 'Lore de divas y personajes.',
+        route: '/apps/divas',
         component: <Divas />,
       },
       {
@@ -57,6 +67,7 @@ export default function TrashMateShell() {
         name: 'CENTERFOLDS.zip',
         icon: '📸',
         description: 'Lookbooks y editoriales.',
+        route: '/apps/centerfolds',
         component: <Centerfolds />,
       },
       {
@@ -64,6 +75,7 @@ export default function TrashMateShell() {
         name: 'STsLK3R_Z0NE',
         icon: '👾',
         description: 'Social y transmisiones.',
+        route: '/apps/stalker-zone',
         component: <StalkerZone />,
       },
     ],
@@ -73,6 +85,21 @@ export default function TrashMateShell() {
   const activeApp = apps.find((app) => app.id === activeAppId) ?? apps[0];
 
   const openApp = (id: string) => {
+    const app = apps.find((item) => item.id === id);
+    if (!app) return;
+
+    const userRank = gamification?.rank?.slug;
+    const canOpen = canAccessRoute(app.route, userRank);
+    if (!canOpen) {
+      const route = getRouteByPath(app.route);
+      const requiredRank = route?.requiredRank
+        ? getRankNameBySlug(route.requiredRank)
+        : 'un rango superior';
+      setLockMessage(`🔒 Necesitas ${requiredRank} para abrir ${app.name}.`);
+      return;
+    }
+
+    setLockMessage('');
     setActiveAppId(id);
     setView('app');
   };
@@ -95,6 +122,12 @@ export default function TrashMateShell() {
                 Bienvenida, bruja móvil. Selecciona una app para iniciar tu ritual.
               </div>
             </div>
+
+            {lockMessage && (
+              <div className="win95-input bg-white p-2 font-vt323 text-xs text-[#7c2d12]">
+                {lockMessage}
+              </div>
+            )}
 
             <div className="trash-mate-grid">
               {apps.map((app) => (

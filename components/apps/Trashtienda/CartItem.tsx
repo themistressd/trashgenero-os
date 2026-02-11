@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 import type { CartItem as CartItemType } from '@/types/woocommerce';
 
@@ -18,10 +19,13 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
       {/* Thumbnail */}
       <div className="h-16 w-16 flex-shrink-0 overflow-hidden border-2 border-gray-400">
         {item.product.images.length > 0 ? (
-          <img
+          <Image
             src={item.product.images[0].src}
             alt={item.product.images[0].alt}
             className="h-full w-full object-cover"
+            width={96}
+            height={96}
+            unoptimized
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-200">

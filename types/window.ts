@@ -22,7 +22,7 @@ export interface WindowState {
   resizable: boolean;
   draggable: boolean;
   icon?: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface WindowManagerState {
@@ -40,5 +40,5 @@ export interface WindowConfig {
   resizable?: boolean;
   draggable?: boolean;
   icon?: string;
-  data?: any;
+  data?: unknown;
 }
