@@ -52,7 +52,7 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
 
   const handleQuickAdd = (product: Product) => {
     addItem({
-      key: `${product.id}-${Date.now()}`,
+      key: String(product.id),
       product_id: product.id,
       variation_id: 0,
       quantity: 1,

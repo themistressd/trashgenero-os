@@ -25,9 +25,9 @@ export default function StartMenu({
   onSelectWallpaper,
   onClose,
 }: StartMenuProps) {
-  if (!isOpen) return null;
-
   const [query, setQuery] = React.useState('');
+
+  if (!isOpen) return null;
 
   const categoryMap: Record<string, string> = {
     'secta-trash': 'Gamificación',

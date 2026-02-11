@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ProductImage } from '@/types/woocommerce';
@@ -95,10 +96,13 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   : 'border-gray-400 opacity-60 hover:opacity-80'
               }`}
             >
-              <img
+              <Image
                 src={image.src}
                 alt={image.alt}
                 className="h-full w-full object-cover"
+                width={128}
+                height={128}
+                unoptimized
               />
             </button>
           ))}
