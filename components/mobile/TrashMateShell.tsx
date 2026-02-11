@@ -7,6 +7,12 @@ import MistressD from '@/components/apps/MistressD/MistressD';
 import Divas from '@/components/apps/Divas/Divas';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
+import XXXperience from '@/components/apps/XXXperience/XXXperience';
+import Grimorio from '@/components/apps/Grimorio/Grimorio';
+import Transmisiones from '@/components/apps/Transmisiones/Transmisiones';
+import MiSecta from '@/components/apps/MiSecta/MiSecta';
+import Rituales from '@/components/apps/Rituales/Rituales';
+import Altar from '@/components/apps/Altar/Altar';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
 import { getRankNameBySlug } from '@/lib/constants/ranks';
@@ -77,6 +83,54 @@ export default function TrashMateShell() {
         description: 'Social y transmisiones.',
         route: '/apps/stalker-zone',
         component: <StalkerZone />,
+      },
+      {
+        id: 'xxxperience',
+        name: 'XXXperience.zip',
+        icon: '🕹️',
+        description: 'Mini-juegos rituales.',
+        route: '/apps/xxxperience',
+        component: <XXXperience />,
+      },
+      {
+        id: 'grimorio',
+        name: 'TRASH-ZINE.pdf',
+        icon: '📖',
+        description: 'Blog y manifiestos.',
+        route: '/apps/grimorio',
+        component: <Grimorio />,
+      },
+      {
+        id: 'transmisiones',
+        name: 'TRASH_VISION.exe',
+        icon: '📺',
+        description: 'Streams y contenido exclusivo.',
+        route: '/apps/transmisiones',
+        component: <Transmisiones />,
+      },
+      {
+        id: 'mi-secta',
+        name: 'MiSecta.sys',
+        icon: '👤',
+        description: 'Perfil y progresión personal.',
+        route: '/apps/mi-secta',
+        component: <MiSecta />,
+      },
+      {
+        id: 'rituales',
+        name: 'Rituales.calendar',
+        icon: '🔮',
+        description: 'Eventos y agenda del culto.',
+        route: '/apps/rituales',
+        component: <Rituales />,
+      },
+      {
+        id: 'altar',
+        name: 'Altar.collection',
+        icon: '✨',
+        description: 'Coleccionables y logros.',
+        route: '/apps/altar',
+        component: <Altar />,
       },
     ],
     []
@@ -215,11 +269,60 @@ export default function TrashMateShell() {
         </button>
         <button
           type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'grimorio' ? 'active' : ''}`}
+          onClick={() => openApp('grimorio')}
+        >
+          <span>📖</span>
+          <span>Zine</span>
+        </button>
+
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'transmisiones' ? 'active' : ''}`}
+          onClick={() => openApp('transmisiones')}
+        >
+          <span>📺</span>
+          <span>Vision</span>
+        </button>
+        <button
+          type="button"
           className={`trash-mate-nav-item ${activeAppId === 'stalker-zone' ? 'active' : ''}`}
           onClick={() => openApp('stalker-zone')}
         >
           <span>👾</span>
           <span>Social</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'xxxperience' ? 'active' : ''}`}
+          onClick={() => openApp('xxxperience')}
+        >
+          <span>🕹️</span>
+          <span>Play</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'mi-secta' ? 'active' : ''}`}
+          onClick={() => openApp('mi-secta')}
+        >
+          <span>👤</span>
+          <span>Perfil</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'rituales' ? 'active' : ''}`}
+          onClick={() => openApp('rituales')}
+        >
+          <span>🔮</span>
+          <span>Ritual</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'altar' ? 'active' : ''}`}
+          onClick={() => openApp('altar')}
+        >
+          <span>✨</span>
+          <span>Altar</span>
         </button>
       </nav>
     </div>
