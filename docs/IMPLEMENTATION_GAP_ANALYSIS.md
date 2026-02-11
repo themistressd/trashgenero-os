@@ -89,7 +89,7 @@ Validación rápida local ejecutada en este corte:
 - Sonidos y notificaciones existen, con toggle y utilidades (`lib/constants/sounds.ts`, `components/ui/NotificationToaster.tsx`, `components/apps/Ajustes/Ajustes.tsx`).
 - Error handling básico presente por fallbacks mock en APIs.
 - Pendiente crítico:
-  - QA de flujos completos (lint/test/build en CI).
+  - QA en CI base ya cubierta para lint/type-check/build; falta ampliar con tests automatizados funcionales/e2e.
   - Hardening de accesibilidad (auditoría formal).
   - Optimización y monitoreo de performance en producción.
   - Assets reales para audio/medios (no se detecta carpeta `public/` con recursos finales).
