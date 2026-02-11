@@ -8,6 +8,8 @@ import Divas from '@/components/apps/Divas/Divas';
 import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import XXXperience from '@/components/apps/XXXperience/XXXperience';
+import Grimorio from '@/components/apps/Grimorio/Grimorio';
+import Transmisiones from '@/components/apps/Transmisiones/Transmisiones';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
 import { getRankNameBySlug } from '@/lib/constants/ranks';
@@ -86,6 +88,22 @@ export default function TrashMateShell() {
         description: 'Mini-juegos rituales.',
         route: '/apps/xxxperience',
         component: <XXXperience />,
+      },
+      {
+        id: 'grimorio',
+        name: 'TRASH-ZINE.pdf',
+        icon: '📖',
+        description: 'Blog y manifiestos.',
+        route: '/apps/grimorio',
+        component: <Grimorio />,
+      },
+      {
+        id: 'transmisiones',
+        name: 'TRASH_VISION.exe',
+        icon: '📺',
+        description: 'Streams y contenido exclusivo.',
+        route: '/apps/transmisiones',
+        component: <Transmisiones />,
       },
     ],
     []
@@ -221,6 +239,23 @@ export default function TrashMateShell() {
         >
           <span>🛍️</span>
           <span>Shop</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'grimorio' ? 'active' : ''}`}
+          onClick={() => openApp('grimorio')}
+        >
+          <span>📖</span>
+          <span>Zine</span>
+        </button>
+
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'transmisiones' ? 'active' : ''}`}
+          onClick={() => openApp('transmisiones')}
+        >
+          <span>📺</span>
+          <span>Vision</span>
         </button>
         <button
           type="button"
