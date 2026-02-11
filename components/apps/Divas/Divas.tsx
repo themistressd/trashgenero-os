@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { useDivas, useDivaTypes } from '@/lib/hooks/useDivas';
 import type { WPCustomPost, WPEmbedded } from '@/types/wordpress';
@@ -84,7 +85,7 @@ export default function Divas() {
                 >
                   <div className="flex h-32 w-full items-center justify-center overflow-hidden bg-gray-100">
                     {image ? (
-                      <img src={image} alt={diva.title.rendered} className="h-full w-full object-cover" />
+                      <Image src={image} alt={diva.title.rendered} className="h-full w-full object-cover" width={512} height={384} unoptimized />
                     ) : (
                       <span className="font-vt323 text-sm text-gray-400">Sin imagen</span>
                     )}
@@ -124,10 +125,13 @@ export default function Divas() {
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="h-48 w-full overflow-hidden bg-gray-100 md:w-1/3">
                   {getFeaturedImage(selectedDiva._embedded) ? (
-                    <img
+                    <Image
                       src={getFeaturedImage(selectedDiva._embedded)}
                       alt={selectedDiva.title.rendered}
                       className="h-full w-full object-cover"
+                      width={512}
+                      height={384}
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center font-vt323 text-sm text-gray-400">

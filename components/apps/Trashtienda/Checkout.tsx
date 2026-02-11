@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import DiscountBadge from './DiscountBadge';
 import { useCartStore } from '@/lib/store/cartStore';
 import { useGamification } from '@/lib/hooks/useGamification';

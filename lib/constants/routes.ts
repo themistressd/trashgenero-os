@@ -2,6 +2,8 @@
  * Application routes configuration
  */
 
+import { RANK_DISCOUNTS } from './ranks';
+
 export interface RouteConfig {
   path: string;
   name: string;
@@ -10,6 +12,13 @@ export interface RouteConfig {
   requiredRank?: string;
   isPublic?: boolean;
 }
+
+const RANK_ORDER = Object.keys(RANK_DISCOUNTS);
+
+const getRankIndex = (rankSlug?: string): number => {
+  if (!rankSlug) return -1;
+  return RANK_ORDER.indexOf(rankSlug);
+};
 
 export const ROUTES: Record<string, RouteConfig> = {
   // Boot routes
@@ -34,7 +43,7 @@ export const ROUTES: Record<string, RouteConfig> = {
     description: 'Auto-login sequence',
     isPublic: true,
   },
-  
+
   // Desktop
   desktop: {
     path: '/',
@@ -43,8 +52,52 @@ export const ROUTES: Record<string, RouteConfig> = {
     description: 'Main desktop',
     isPublic: false,
   },
-  
+
   // Apps
+  mistressD: {
+    path: '/apps/mistress-d',
+    name: 'Mistress D',
+    icon: '⚡',
+    description: 'Bio, manifiesto y archivo personal',
+    isPublic: false,
+  },
+  divas: {
+    path: '/apps/divas',
+    name: 'Divas',
+    icon: '👯‍♀️',
+    description: 'Lore y personajes del universo TrashGènero',
+    isPublic: false,
+  },
+  stalkerZone: {
+    path: '/apps/stalker-zone',
+    name: 'Stalker Zone',
+    icon: '📡',
+    description: 'Redes sociales y enlaces del culto',
+    isPublic: false,
+  },
+  xxxperience: {
+    path: '/apps/xxxperience',
+    name: 'XXXperience',
+    icon: '🎯',
+    description: 'Mini-juegos rituales y desafíos interactivos',
+    requiredRank: 'monaguillo-del-rastro',
+    isPublic: false,
+  },
+  centerfolds: {
+    path: '/apps/centerfolds',
+    name: 'Centerfolds',
+    icon: '📌',
+    description: 'Lookbooks, editoriales y archivo visual',
+    requiredRank: 'aprendiz-maricon',
+    isPublic: false,
+  },
+  sectaTrash: {
+    path: '/apps/secta-trash',
+    name: 'SectaTrash',
+    icon: '🎮',
+    description: 'Dashboard de gamificación y progreso',
+    isPublic: false,
+  },
   trashtienda: {
     path: '/apps/trashtienda',
     name: 'Trashtienda',
@@ -85,6 +138,7 @@ export const ROUTES: Record<string, RouteConfig> = {
     name: 'Transmisiones',
     icon: '📡',
     description: 'Live streams and exclusive content',
+    requiredRank: 'sacerdote-del-patron',
     isPublic: false,
   },
   pesetrashWallet: {
@@ -135,12 +189,17 @@ export const routeRequiresAuth = (path: string): boolean => {
 /**
  * Check if user can access route based on rank
  */
-export const canAccessRoute = (path: string, _userRank?: string): boolean => {
+export const canAccessRoute = (path: string, userRank?: string): boolean => {
   const route = getRouteByPath(path);
   if (!route) return false;
   if (route.isPublic) return true;
   if (!route.requiredRank) return true;
-  
-  // TODO: Implement rank hierarchy check
-  return true;
+
+  const userRankIndex = getRankIndex(userRank);
+  const requiredRankIndex = getRankIndex(route.requiredRank);
+
+  if (requiredRankIndex === -1) return true;
+  if (userRankIndex === -1) return false;
+
+  return userRankIndex >= requiredRankIndex;
 };
