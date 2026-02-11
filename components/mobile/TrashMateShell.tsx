@@ -10,6 +10,9 @@ import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import XXXperience from '@/components/apps/XXXperience/XXXperience';
 import Grimorio from '@/components/apps/Grimorio/Grimorio';
 import Transmisiones from '@/components/apps/Transmisiones/Transmisiones';
+import MiSecta from '@/components/apps/MiSecta/MiSecta';
+import Rituales from '@/components/apps/Rituales/Rituales';
+import Altar from '@/components/apps/Altar/Altar';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
 import { getRankNameBySlug } from '@/lib/constants/ranks';
@@ -104,6 +107,30 @@ export default function TrashMateShell() {
         description: 'Streams y contenido exclusivo.',
         route: '/apps/transmisiones',
         component: <Transmisiones />,
+      },
+      {
+        id: 'mi-secta',
+        name: 'MiSecta.sys',
+        icon: '👤',
+        description: 'Perfil y progresión personal.',
+        route: '/apps/mi-secta',
+        component: <MiSecta />,
+      },
+      {
+        id: 'rituales',
+        name: 'Rituales.calendar',
+        icon: '🔮',
+        description: 'Eventos y agenda del culto.',
+        route: '/apps/rituales',
+        component: <Rituales />,
+      },
+      {
+        id: 'altar',
+        name: 'Altar.collection',
+        icon: '✨',
+        description: 'Coleccionables y logros.',
+        route: '/apps/altar',
+        component: <Altar />,
       },
     ],
     []
@@ -272,6 +299,14 @@ export default function TrashMateShell() {
         >
           <span>🕹️</span>
           <span>Play</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'rituales' ? 'active' : ''}`}
+          onClick={() => openApp('rituales')}
+        >
+          <span>🔮</span>
+          <span>Ritual</span>
         </button>
       </nav>
     </div>
