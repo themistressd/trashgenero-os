@@ -37,6 +37,7 @@ export default function TrashMateShell() {
         description: 'Perfil, rangos y puntos.',
         route: '/apps/secta-trash',
         component: <SectaTrash />,
+
       },
       {
         id: 'trashtienda',
@@ -45,6 +46,7 @@ export default function TrashMateShell() {
         description: 'Compras y drops rituales.',
         route: '/apps/trashtienda',
         component: <Trashtienda />,
+
       },
       {
         id: 'mistress-d',
@@ -53,6 +55,7 @@ export default function TrashMateShell() {
         description: 'Archivo personal y manifiesto.',
         route: '/apps/mistress-d',
         component: <MistressD />,
+
       },
       {
         id: 'divas',
@@ -61,6 +64,7 @@ export default function TrashMateShell() {
         description: 'Lore de divas y personajes.',
         route: '/apps/divas',
         component: <Divas />,
+
       },
       {
         id: 'centerfolds',
@@ -69,6 +73,7 @@ export default function TrashMateShell() {
         description: 'Lookbooks y editoriales.',
         route: '/apps/centerfolds',
         component: <Centerfolds />,
+
       },
       {
         id: 'stalker-zone',
@@ -77,6 +82,7 @@ export default function TrashMateShell() {
         description: 'Social y transmisiones.',
         route: '/apps/stalker-zone',
         component: <StalkerZone />,
+
       },
     ],
     []
