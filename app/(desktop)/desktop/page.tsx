@@ -34,6 +34,9 @@ import TrashMateShell from '@/components/mobile/TrashMateShell';
 import { DESKTOP_ICONS } from '@/lib/constants/icons';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
 import { useNotifications } from '@/lib/store/notificationStore';
+import { useGamification } from '@/lib/hooks/useGamification';
+import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
+import { getRankDiscount } from '@/lib/constants/ranks';
 import '@/styles/themes/trash-os.css';
 
 const ICON_GRID_SIZE = 88;
@@ -54,6 +57,7 @@ export default function DesktopPage() {
     focusWindow,
   } = useWindowStore();
   const notifications = useNotifications();
+  const { gamification } = useGamification();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // State for icon positions with localStorage
@@ -117,6 +121,20 @@ export default function DesktopPage() {
   const handleIconDoubleClick = (iconId: string) => {
     const icon = DESKTOP_ICONS.find((i) => i.id === iconId);
     if (!icon) return;
+
+    const userRank = gamification?.rank?.slug;
+    const canOpen = icon.route ? canAccessRoute(icon.route, userRank) : true;
+    if (!canOpen) {
+      const route = icon.route ? getRouteByPath(icon.route) : undefined;
+      const requiredRank = route?.requiredRank
+        ? getRankDiscount(route.requiredRank).name
+        : 'rango superior';
+      notifications.warning(
+        `${icon.name} bloqueada`,
+        `Necesitas alcanzar ${requiredRank} para abrir esta app.`
+      );
+      return;
+    }
 
     setRecentApps((prev) => {
       const next = [iconId, ...prev.filter((id) => id !== iconId)].slice(0, 6);
