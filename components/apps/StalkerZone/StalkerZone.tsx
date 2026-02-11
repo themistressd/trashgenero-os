@@ -227,18 +227,15 @@ export default function StalkerZone() {
                 <div key={link.id} className="win95-input bg-white p-8 text-center">
                   <div className="text-4xl">{link.icon}</div>
                   <h3 className="mt-2 text-xl text-[#000080]">{link.label}</h3>
-                  {link.href === '#' ? (
-                    <p className="mt-2 text-sm text-gray-500">Próximamente</p>
-                  ) : (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-4 inline-block win95-button px-4 py-2 text-sm"
-                    >
-                      Abrir {link.label}
-                    </a>
-                  )}
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block win95-button px-4 py-2 text-sm"
+                  >
+                    Abrir {link.label}
+                  </a>
+                  <p className="mt-2 text-xs text-gray-500">Disponible en nueva pestaña</p>
                 </div>
               ))}
           </div>
