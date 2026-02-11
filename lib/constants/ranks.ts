@@ -51,3 +51,18 @@ export const RANK_DISCOUNTS: Record<string, RankDiscount> = {
 export const getRankDiscount = (slug: string): RankDiscount => {
   return RANK_DISCOUNTS[slug] || RANK_DISCOUNTS['novicia-normativa'];
 };
+
+
+/**
+ * Get rank data by slug without fallback
+ */
+export const getRankBySlug = (slug: string): RankDiscount | undefined => {
+  return RANK_DISCOUNTS[slug];
+};
+
+/**
+ * Get rank display name by slug
+ */
+export const getRankNameBySlug = (slug: string): string => {
+  return getRankBySlug(slug)?.name || slug;
+};

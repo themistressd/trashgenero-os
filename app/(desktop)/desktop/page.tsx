@@ -36,7 +36,7 @@ import { WALLPAPERS } from '@/lib/constants/wallpapers';
 import { useNotifications } from '@/lib/store/notificationStore';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
-import { getRankDiscount } from '@/lib/constants/ranks';
+import { getRankNameBySlug } from '@/lib/constants/ranks';
 import '@/styles/themes/trash-os.css';
 
 const ICON_GRID_SIZE = 88;
@@ -127,7 +127,7 @@ export default function DesktopPage() {
     if (!canOpen) {
       const route = icon.route ? getRouteByPath(icon.route) : undefined;
       const requiredRank = route?.requiredRank
-        ? getRankDiscount(route.requiredRank).name
+        ? getRankNameBySlug(route.requiredRank)
         : 'rango superior';
       notifications.warning(
         `${icon.name} bloqueada`,

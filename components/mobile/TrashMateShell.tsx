@@ -9,7 +9,7 @@ import Centerfolds from '@/components/apps/Centerfolds/Centerfolds';
 import StalkerZone from '@/components/apps/StalkerZone/StalkerZone';
 import { useGamification } from '@/lib/hooks/useGamification';
 import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
-import { getRankDiscount } from '@/lib/constants/ranks';
+import { getRankNameBySlug } from '@/lib/constants/ranks';
 
 type TrashMateView = 'home' | 'app';
 
@@ -99,7 +99,7 @@ export default function TrashMateShell() {
     if (!canOpen) {
       const route = getRouteByPath(app.route);
       const requiredRank = route?.requiredRank
-        ? getRankDiscount(route.requiredRank).name
+        ? getRankNameBySlug(route.requiredRank)
         : 'un rango superior';
       setLockMessage(`🔒 Necesitas ${requiredRank} para abrir ${app.name}.`);
       return;
