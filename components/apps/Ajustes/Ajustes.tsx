@@ -1,22 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { WALLPAPERS } from '@/lib/constants/wallpapers';
 
 export default function Ajustes() {
-  const [selectedWallpaper, setSelectedWallpaper] = useState('void');
-  const [soundsEnabled, setSoundsEnabled] = useState(true);
-
-  useEffect(() => {
-    const savedWallpaper = localStorage.getItem('desktop-wallpaper');
-    if (savedWallpaper) {
-      setSelectedWallpaper(savedWallpaper);
-    }
-    const savedSounds = localStorage.getItem('trash-os-sounds');
-    if (savedSounds) {
-      setSoundsEnabled(savedSounds !== 'false');
-    }
-  }, []);
+  const [selectedWallpaper, setSelectedWallpaper] = useState(() => {
+    if (typeof window === 'undefined') return 'void';
+    return localStorage.getItem('desktop-wallpaper') || 'void';
+  });
+  const [soundsEnabled, setSoundsEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('trash-os-sounds') !== 'false';
+  });
 
   const handleWallpaperChange = (wallpaperId: string) => {
     setSelectedWallpaper(wallpaperId);

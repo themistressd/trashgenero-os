@@ -28,25 +28,23 @@ export default function Window({
     windows,
   } = useWindowStore();
   const windowData = windows.find((w) => w.id === id);
-  
-  if (!windowData) return null;
-
-  const { isMinimized, isMaximized, zIndex, position, size } = windowData;
+  const isMissing = !windowData;
+  const isMinimized = windowData?.isMinimized ?? true;
+  const isMaximized = windowData?.isMaximized ?? false;
+  const zIndex = windowData?.zIndex ?? 0;
+  const position = windowData?.position ?? { x: 0, y: 0 };
+  const size = windowData?.size ?? { width: 600, height: 400 };
   const [isResizing, setIsResizing] = useState(false);
-  const [dragHint, setDragHint] = useState<'left' | 'right' | 'maximized' | null>(null);
   const startPointer = useRef({ x: 0, y: 0 });
   const startSize = useRef({ width: size.width, height: size.height });
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
-    disabled: isMaximized,
+    disabled: isMissing || isMaximized,
   });
   const dragTransform = useMemo(
     () => (transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined),
     [transform]
   );
-
-  // Don't render if minimized
-  if (isMinimized) return null;
 
   const handleClose = () => {
     closeWindow(id);
@@ -80,11 +78,12 @@ export default function Window({
   };
 
   useEffect(() => {
+    if (isMissing) return;
     startSize.current = { width: size.width, height: size.height };
-  }, [size.height, size.width]);
+  }, [isMissing, size.height, size.width]);
 
   useEffect(() => {
-    if (!isResizing) return;
+    if (isMissing || !isResizing) return;
 
     const handlePointerMove = (event: PointerEvent) => {
       const deltaX = event.clientX - startPointer.current.x;
@@ -106,33 +105,28 @@ export default function Window({
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [id, isResizing, updateWindowSize]);
+  }, [id, isMissing, isResizing, updateWindowSize]);
 
-  useEffect(() => {
-    if (!transform || isMaximized) {
-      setDragHint(null);
-      return;
-    }
+
+  const dragHint = useMemo<'left' | 'right' | 'maximized' | null>(() => {
+    if (isMissing || !transform || isMaximized) return null;
+
     const nextPosition = {
       x: position.x + transform.x,
       y: position.y + transform.y,
     };
-    const viewportWidth = window.innerWidth;
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : size.width;
     const snapThreshold = 40;
-    if (nextPosition.y <= snapThreshold) {
-      setDragHint('maximized');
-      return;
-    }
-    if (nextPosition.x <= snapThreshold) {
-      setDragHint('left');
-      return;
-    }
-    if (nextPosition.x + size.width >= viewportWidth - snapThreshold) {
-      setDragHint('right');
-      return;
-    }
-    setDragHint(null);
-  }, [isMaximized, position.x, position.y, size.width, transform]);
+
+    if (nextPosition.y <= snapThreshold) return 'maximized';
+    if (nextPosition.x <= snapThreshold) return 'left';
+    if (nextPosition.x + size.width >= viewportWidth - snapThreshold) return 'right';
+
+    return null;
+  }, [isMaximized, isMissing, position.x, position.y, size.width, transform]);
+
+  // Don't render if minimized or missing
+  if (isMissing || isMinimized) return null;
 
   return (
     <motion.div

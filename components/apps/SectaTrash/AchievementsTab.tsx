@@ -13,23 +13,6 @@ export default function AchievementsTab() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [query, setQuery] = useState('');
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="font-vt323 text-lg text-gray-600">Cargando logros...</div>
-      </div>
-    );
-  }
-  if (isError) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
-          ⚠️ No se pudieron cargar los logros.
-        </div>
-      </div>
-    );
-  }
-
   const handleAchievementClick = (achievement: Achievement) => {
     setSelectedAchievement(
       selectedAchievement?.id === achievement.id ? null : achievement
@@ -62,6 +45,24 @@ export default function AchievementsTab() {
       locked: filteredAchievements.filter((achievement) => !achievement.unlocked),
     };
   }, [filteredAchievements]);
+
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="font-vt323 text-lg text-gray-600">Cargando logros...</div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="win95-input bg-white p-4 text-center font-vt323 text-sm text-gray-700">
+          ⚠️ No se pudieron cargar los logros.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4">

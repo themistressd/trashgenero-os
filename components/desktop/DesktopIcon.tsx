@@ -14,6 +14,8 @@ interface DesktopIconProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
   onDoubleClick: (id: string) => void;
   onPositionChange: (id: string, position: { x: number; y: number }) => void;
+  locked?: boolean;
+  lockLabel?: string;
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -32,6 +34,8 @@ export default function DesktopIcon({
   containerRef,
   onDoubleClick,
   onPositionChange,
+  locked = false,
+  lockLabel,
 }: DesktopIconProps) {
   return (
     <motion.div
@@ -93,7 +97,7 @@ export default function DesktopIcon({
         event.stopPropagation();
         onDoubleClick(id);
       }}
-      aria-label={`Abrir ${name}`}
+      aria-label={locked ? `${name} bloqueada` : `Abrir ${name}`}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => {
@@ -103,8 +107,23 @@ export default function DesktopIcon({
         }
       }}
     >
-      <div className="desktop-icon-image">{icon}</div>
+      <div className="desktop-icon-image relative">
+        {icon}
+        {locked && (
+          <span
+            className="absolute -right-1 -top-1 rounded-full border border-black bg-[#fef08a] px-1 text-[10px] leading-none"
+            aria-hidden="true"
+          >
+            🔒
+          </span>
+        )}
+      </div>
       <div className="desktop-icon-name">{name}</div>
+      {locked && lockLabel && (
+        <div className="mt-1 max-w-[96px] rounded border border-[#7f1d1d] bg-[#fff7ed] px-1 py-[2px] text-center font-vt323 text-[10px] text-[#7f1d1d]">
+          {lockLabel}
+        </div>
+      )}
     </motion.div>
   );
 }
