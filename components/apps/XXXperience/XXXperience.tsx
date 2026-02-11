@@ -23,6 +23,7 @@ const SYMBOLS = ['🧿', '💾', '⚡', '🔮', '🪙', '🃏', '💎', '✨'];
 export default function XXXperience() {
   const [search, setSearch] = useState('');
   const [activeGame, setActiveGame] = useState<GameModule | null>(null);
+  const [lockMessage, setLockMessage] = useState('');
   const [targetIndex, setTargetIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -91,6 +92,17 @@ export default function XXXperience() {
       })),
     [round, score]
   );
+
+
+  const openGame = (game: GameModule) => {
+    if (game.status === 'locked') {
+      setLockMessage('🔒 Este juego sigue bloqueado hasta el siguiente rango ritual.');
+      return;
+    }
+
+    setLockMessage('');
+    setActiveGame(game);
+  };
 
   const closeModal = () => {
     if (timerRef.current) {
@@ -182,13 +194,21 @@ export default function XXXperience() {
         />
       </div>
 
+
+      {lockMessage && (
+        <div className="win95-input bg-white p-2 font-vt323 text-xs text-[#7c2d12]">
+          {lockMessage}
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
         {filtered.map((game) => (
           <button
             key={game.id}
             type="button"
-            onClick={() => setActiveGame(game)}
-            className="rounded border-2 border-[#808080] bg-[#dfdfdf] p-4 text-left transition hover:border-bubblegum-pink"
+            onClick={() => openGame(game)}
+            className={`rounded border-2 border-[#808080] bg-[#dfdfdf] p-4 text-left transition ${game.status === 'locked' ? 'cursor-not-allowed opacity-80' : 'hover:border-bubblegum-pink'}`}
+            aria-disabled={game.status === 'locked'}
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
