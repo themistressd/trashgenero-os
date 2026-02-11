@@ -302,11 +302,27 @@ export default function TrashMateShell() {
         </button>
         <button
           type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'mi-secta' ? 'active' : ''}`}
+          onClick={() => openApp('mi-secta')}
+        >
+          <span>👤</span>
+          <span>Perfil</span>
+        </button>
+        <button
+          type="button"
           className={`trash-mate-nav-item ${activeAppId === 'rituales' ? 'active' : ''}`}
           onClick={() => openApp('rituales')}
         >
           <span>🔮</span>
           <span>Ritual</span>
+        </button>
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'altar' ? 'active' : ''}`}
+          onClick={() => openApp('altar')}
+        >
+          <span>✨</span>
+          <span>Altar</span>
         </button>
       </nav>
     </div>
