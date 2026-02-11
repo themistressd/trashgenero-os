@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { useLookbooks } from '@/lib/hooks/useLookbooks';
 import type { WPCustomPost, WPEmbedded } from '@/types/wordpress';
@@ -67,10 +68,13 @@ export default function Centerfolds() {
               >
                 <div className="flex h-32 w-full items-center justify-center overflow-hidden bg-gray-100">
                   {getFeaturedImage(lookbook._embedded) ? (
-                    <img
+                    <Image
                       src={getFeaturedImage(lookbook._embedded)}
                       alt={lookbook.title.rendered}
                       className="h-full w-full object-cover"
+                      width={512}
+                      height={256}
+                      unoptimized
                     />
                   ) : (
                     <span className="font-vt323 text-sm text-gray-400">Sin cover</span>
@@ -114,7 +118,7 @@ export default function Centerfolds() {
                 <div>
                   <div className="h-80 w-full overflow-hidden bg-gray-100">
                     {selectedImage ? (
-                      <img src={selectedImage} alt="Lookbook" className="h-full w-full object-cover" />
+                      <Image src={selectedImage} alt="Lookbook" className="h-full w-full object-cover" width={1024} height={640} unoptimized />
                     ) : (
                       <div className="flex h-full items-center justify-center font-vt323 text-sm text-gray-400">
                         Sin imágenes
@@ -131,7 +135,7 @@ export default function Centerfolds() {
                             selectedImage === image ? 'border-bubblegum-pink' : 'border-gray-200'
                           }`}
                         >
-                          <img src={image} alt="Thumbnail" className="h-full w-full object-cover" />
+                          <Image src={image} alt="Thumbnail" className="h-full w-full object-cover" width={128} height={128} unoptimized />
                         </button>
                       ))}
                     </div>

@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import type { DesktopIcon } from '@/types/desktop';
 import type { WallpaperOption } from '@/lib/constants/wallpapers';
+import { useGamification } from '@/lib/hooks/useGamification';
+import { canAccessRoute, getRouteByPath } from '@/lib/constants/routes';
+import { getRankNameBySlug } from '@/lib/constants/ranks';
 
 interface StartMenuProps {
   isOpen: boolean;
@@ -25,9 +28,27 @@ export default function StartMenu({
   onSelectWallpaper,
   onClose,
 }: StartMenuProps) {
-  if (!isOpen) return null;
+  const [query, setQuery] = useState('');
+  const [lockMessage, setLockMessage] = useState<string>('');
+  const { gamification } = useGamification();
 
-  const [query, setQuery] = React.useState('');
+  const userRank = gamification?.rank?.slug;
+  const iconAccessMap = useMemo(
+    () =>
+      Object.fromEntries(
+        icons.map((icon) => {
+          const canOpen = icon.route ? canAccessRoute(icon.route, userRank) : true;
+          const route = icon.route ? getRouteByPath(icon.route) : undefined;
+          const requiredRankLabel = route?.requiredRank
+            ? getRankNameBySlug(route.requiredRank)
+            : undefined;
+          return [icon.id, { canOpen, requiredRankLabel }];
+        })
+      ),
+    [icons, userRank]
+  );
+
+  if (!isOpen) return null;
 
   const categoryMap: Record<string, string> = {
     'secta-trash': 'Gamificación',
@@ -47,6 +68,20 @@ export default function StartMenu({
     acc[category] = acc[category] ? [...acc[category], icon] : [icon];
     return acc;
   }, {});
+
+
+  const handleOpenIcon = (icon: DesktopIcon) => {
+    const access = iconAccessMap[icon.id];
+    if (access && !access.canOpen) {
+      setLockMessage(
+        `🔒 ${icon.name} requiere ${access.requiredRankLabel || 'un rango superior'}.`
+      );
+      return;
+    }
+    setLockMessage('');
+    onOpenApp(icon);
+    onClose();
+  };
 
   return (
     <div
@@ -76,6 +111,14 @@ export default function StartMenu({
         </label>
       </div>
 
+      {lockMessage && (
+        <div className="start-menu-section">
+          <div className="win95-input bg-white p-2 font-vt323 text-xs text-[#7c2d12]">
+            {lockMessage}
+          </div>
+        </div>
+      )}
+
       {recentApps.length > 0 && (
         <div className="start-menu-section">
           <h3>Recientes</h3>
@@ -84,15 +127,18 @@ export default function StartMenu({
               <button
                 key={icon.id}
                 className="start-menu-item"
-                onClick={() => {
-                  onOpenApp(icon);
-                  onClose();
-                }}
+                onClick={() => handleOpenIcon(icon)}
               >
-                <span className="start-menu-item-icon">{icon.icon}</span>
+                <span className="start-menu-item-icon">
+                  {icon.icon}
+                  {!iconAccessMap[icon.id]?.canOpen && <span className="ml-1 text-xs">🔒</span>}
+                </span>
                 <span>
                   <strong>{icon.name}</strong>
                   <small>{icon.description}</small>
+                  {!iconAccessMap[icon.id]?.canOpen && iconAccessMap[icon.id]?.requiredRankLabel && (
+                    <small className="block text-[#7c2d12]">Req: {iconAccessMap[icon.id].requiredRankLabel}</small>
+                  )}
                 </span>
               </button>
             ))}
@@ -110,10 +156,7 @@ export default function StartMenu({
                 <button
                   key={icon.id}
                   className="start-menu-item"
-                  onClick={() => {
-                    onOpenApp(icon);
-                    onClose();
-                  }}
+                  onClick={() => handleOpenIcon(icon)}
                 >
                   <span className="start-menu-item-icon">{icon.icon}</span>
                   <span>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import ProductGallery from './ProductGallery';
 import DiscountBadge from './DiscountBadge';
 import { useProduct } from '@/lib/hooks/useProducts';

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SOCIAL_LINKS } from '@/lib/constants/socialLinks';
 
@@ -17,6 +18,18 @@ interface InstagramProfile {
   username: string;
   followers: string;
   description: string;
+}
+
+interface InstagramEdgeNode {
+  id: string;
+  display_url: string;
+  taken_at_timestamp: number;
+  shortcode: string;
+  edge_media_to_caption?: { edges?: Array<{ node?: { text?: string } }> };
+}
+
+interface InstagramEdge {
+  node: InstagramEdgeNode;
 }
 
 const mockProfile: InstagramProfile = {
@@ -78,9 +91,9 @@ export default function StalkerZone() {
         if (!response.ok) throw new Error('Instagram API error');
         const data = await response.json();
         const user = data?.graphql?.user;
-        const edges = user?.edge_owner_to_timeline_media?.edges || [];
+        const edges = (user?.edge_owner_to_timeline_media?.edges || []) as InstagramEdge[];
 
-        const fetchedPosts: InstagramPost[] = edges.slice(0, 9).map((edge: any) => ({
+        const fetchedPosts: InstagramPost[] = edges.slice(0, 9).map((edge) => ({
           id: edge.node.id,
           image: edge.node.display_url,
           caption: edge.node.edge_media_to_caption?.edges?.[0]?.node?.text || 'Nueva transmisión.',
@@ -184,7 +197,7 @@ export default function StalkerZone() {
                       className="text-left transition hover:opacity-90"
                     >
                       <div className="h-28 w-full overflow-hidden bg-gray-100">
-                        <img src={post.image} alt={post.caption} className="h-full w-full object-cover" />
+                        <Image src={post.image} alt={post.caption} className="h-full w-full object-cover" width={320} height={180} unoptimized />
                       </div>
                       <div className="mt-2 font-vt323 text-xs text-gray-700 line-clamp-2">
                         {post.caption}

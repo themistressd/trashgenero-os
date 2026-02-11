@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '@/types/woocommerce';
@@ -30,10 +31,13 @@ export default function ProductCard({ product, onClick, onQuickAdd }: ProductCar
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         {product.images.length > 0 ? (
-          <img
+          <Image
             src={product.images[0].src}
             alt={product.images[0].alt}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            width={512}
+            height={512}
+            unoptimized
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-200">

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface RankUpModalProps {
@@ -16,6 +16,21 @@ export default function RankUpModal({
   rankName,
   benefits,
 }: RankUpModalProps) {
+
+  const confettiParticles = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, index) => ({
+        id: index,
+        x: (index * 37) % 400,
+        scale: 0.5 + ((index * 17) % 50) / 100,
+        rotate: (index * 53) % 360,
+        duration: 2 + ((index * 19) % 20) / 10,
+        delay: ((index * 11) % 5) / 10,
+        icon: ['✨', '⭐', '💖', '🌟'][index % 4],
+      })),
+    []
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -61,28 +76,28 @@ export default function RankUpModal({
 
                 {/* Confetti effect */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  {[...Array(20)].map((_, i) => (
+                  {confettiParticles.map((particle) => (
                     <motion.div
-                      key={i}
-                      initial={{ 
-                        y: -20, 
-                        x: Math.random() * 400,
+                      key={particle.id}
+                      initial={{
+                        y: -20,
+                        x: particle.x,
                         opacity: 1,
-                        scale: Math.random() * 0.5 + 0.5,
+                        scale: particle.scale,
                       }}
                       animate={{
                         y: 600,
-                        rotate: Math.random() * 360,
+                        rotate: particle.rotate,
                         opacity: 0,
                       }}
                       transition={{
-                        duration: Math.random() * 2 + 2,
+                        duration: particle.duration,
                         ease: 'easeOut',
-                        delay: Math.random() * 0.5,
+                        delay: particle.delay,
                       }}
                       className="absolute text-2xl"
                     >
-                      {['✨', '⭐', '💖', '🌟'][Math.floor(Math.random() * 4)]}
+                      {particle.icon}
                     </motion.div>
                   ))}
                 </div>
