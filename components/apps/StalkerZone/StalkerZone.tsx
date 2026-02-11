@@ -93,6 +93,8 @@ export default function StalkerZone() {
   const [dataSource, setDataSource] = useState<DataSource>('mock');
 
   const fetchInstagram = useCallback(async (signal?: AbortSignal) => {
+    let wasAborted = false;
+
     try {
       setIsLoading(true);
       const response = await fetch('https://www.instagram.com/trashgnero/?__a=1&__d=dis', {
@@ -124,6 +126,7 @@ export default function StalkerZone() {
       setHasError(false);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
+        wasAborted = true;
         return;
       }
       setPosts(mockPosts);
@@ -131,6 +134,7 @@ export default function StalkerZone() {
       setDataSource('mock');
       setHasError(true);
     } finally {
+      if (wasAborted) return;
       setIsLoading(false);
       setLastUpdatedAt(new Date());
     }

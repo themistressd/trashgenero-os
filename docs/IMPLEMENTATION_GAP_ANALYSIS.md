@@ -76,7 +76,7 @@ Validación rápida local ejecutada en este corte:
 
 ## Fase 11: Apps - Interactive 👾 — **Parcial**
 
-- `XXXperience.zip` ya incluye una experiencia jugable base (Neon Hunt). `STsLK3R_Z0NE` ya no muestra estados "próximamente" en tabs sociales y ahora incluye reintento manual de sincronización para Instagram, aunque mantiene fallback/mock para parte de sus datos (`components/apps/XXXperience/XXXperience.tsx`, `components/apps/StalkerZone/StalkerZone.tsx`).
+- `XXXperience.zip` ya incluye una experiencia jugable base (Neon Hunt). `STsLK3R_Z0NE` ya no muestra estados "próximamente" en tabs sociales, incluye reintento manual de sincronización para Instagram y control de abort seguro en fetch; aun así mantiene fallback/mock para parte de sus datos (`components/apps/XXXperience/XXXperience.tsx`, `components/apps/StalkerZone/StalkerZone.tsx`).
 
 ## Fase 12: Responsive (Trash-Mate) 📱 — **Avanzada**
 
