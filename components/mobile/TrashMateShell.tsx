@@ -248,6 +248,15 @@ export default function TrashMateShell() {
           <span>📖</span>
           <span>Zine</span>
         </button>
+
+        <button
+          type="button"
+          className={`trash-mate-nav-item ${activeAppId === 'transmisiones' ? 'active' : ''}`}
+          onClick={() => openApp('transmisiones')}
+        >
+          <span>📺</span>
+          <span>Vision</span>
+        </button>
         <button
           type="button"
           className={`trash-mate-nav-item ${activeAppId === 'stalker-zone' ? 'active' : ''}`}
