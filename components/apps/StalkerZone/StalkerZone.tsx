@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SOCIAL_LINKS } from '@/lib/constants/socialLinks';
 
 type TabKey = 'instagram' | 'tiktok' | 'onlyfans' | 'twitter';
+type DataSource = 'live' | 'mock';
 
 interface InstagramPost {
   id: string;
@@ -76,54 +77,71 @@ const formatDate = (date: string) =>
     year: 'numeric',
   });
 
+const formatTime = (date: Date) =>
+  date.toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
 export default function StalkerZone() {
   const [activeTab, setActiveTab] = useState<TabKey>('instagram');
   const [posts, setPosts] = useState<InstagramPost[]>(mockPosts);
   const [profile, setProfile] = useState<InstagramProfile>(mockProfile);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+  const [dataSource, setDataSource] = useState<DataSource>('mock');
+
+  const fetchInstagram = useCallback(async (signal?: AbortSignal) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('https://www.instagram.com/trashgnero/?__a=1&__d=dis', {
+        cache: 'no-store',
+        signal,
+      });
+      if (!response.ok) throw new Error('Instagram API error');
+      const data = await response.json();
+      const user = data?.graphql?.user;
+      const edges = (user?.edge_owner_to_timeline_media?.edges || []) as InstagramEdge[];
+
+      const fetchedPosts: InstagramPost[] = edges.slice(0, 9).map((edge) => ({
+        id: edge.node.id,
+        image: edge.node.display_url,
+        caption: edge.node.edge_media_to_caption?.edges?.[0]?.node?.text || 'Nueva transmisión.',
+        date: new Date(edge.node.taken_at_timestamp * 1000).toISOString(),
+        link: `https://www.instagram.com/p/${edge.node.shortcode}/`,
+      }));
+
+      setProfile({
+        username: `@${user?.username || 'trashgnero'}`,
+        followers: user?.edge_followed_by?.count?.toLocaleString('es-ES') || mockProfile.followers,
+        description: user?.biography || mockProfile.description,
+      });
+
+      const useMock = fetchedPosts.length === 0;
+      setPosts(useMock ? mockPosts : fetchedPosts);
+      setDataSource(useMock ? 'mock' : 'live');
+      setHasError(false);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+      setPosts(mockPosts);
+      setProfile(mockProfile);
+      setDataSource('mock');
+      setHasError(true);
+    } finally {
+      setIsLoading(false);
+      setLastUpdatedAt(new Date());
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInstagram = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('https://www.instagram.com/trashgnero/?__a=1&__d=dis');
-        if (!response.ok) throw new Error('Instagram API error');
-        const data = await response.json();
-        const user = data?.graphql?.user;
-        const edges = (user?.edge_owner_to_timeline_media?.edges || []) as InstagramEdge[];
+    const controller = new AbortController();
+    fetchInstagram(controller.signal);
 
-        const fetchedPosts: InstagramPost[] = edges.slice(0, 9).map((edge) => ({
-          id: edge.node.id,
-          image: edge.node.display_url,
-          caption: edge.node.edge_media_to_caption?.edges?.[0]?.node?.text || 'Nueva transmisión.',
-          date: new Date(edge.node.taken_at_timestamp * 1000).toISOString(),
-          link: `https://www.instagram.com/p/${edge.node.shortcode}/`,
-        }));
-
-        setProfile({
-          username: `@${user?.username || 'trashgnero'}`,
-          followers: user?.edge_followed_by?.count?.toLocaleString('es-ES') || mockProfile.followers,
-          description: user?.biography || mockProfile.description,
-        });
-
-        if (fetchedPosts.length > 0) {
-          setPosts(fetchedPosts);
-        } else {
-          setPosts(mockPosts);
-        }
-        setHasError(false);
-      } catch {
-        setPosts(mockPosts);
-        setProfile(mockProfile);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInstagram();
-  }, []);
+    return () => controller.abort();
+  }, [fetchInstagram]);
 
   const socialButtons = useMemo(
     () => SOCIAL_LINKS.filter((link) => link.id !== 'instagram'),
@@ -164,14 +182,30 @@ export default function StalkerZone() {
       <div className="flex-1 overflow-hidden bg-[#c0c0c0] p-4">
         {activeTab === 'instagram' && (
           <div className="flex h-full flex-col gap-4">
-            <div className="win95-input flex items-center justify-between bg-white px-4 py-3">
+            <div className="win95-input flex items-center justify-between gap-4 bg-white px-4 py-3">
               <div>
                 <div className="font-vt323 text-lg text-[#000080]">{profile.username}</div>
                 <div className="font-vt323 text-sm text-gray-600">{profile.description}</div>
+                {lastUpdatedAt && (
+                  <div className="mt-1 font-vt323 text-[10px] text-gray-500">
+                    Última actualización: {formatTime(lastUpdatedAt)}
+                  </div>
+                )}
               </div>
               <div className="text-right font-vt323 text-sm text-gray-600">
                 <div>Followers</div>
                 <div className="text-lg text-bubblegum-pink">{profile.followers}</div>
+                <div className={`mt-1 font-vt323 text-[10px] ${dataSource === 'live' ? 'text-green-700' : 'text-amber-700'}`}>
+                  Fuente: {dataSource === 'live' ? 'LIVE' : 'MOCK'}
+                </div>
+                <button
+                  type="button"
+                  className="mt-2 win95-button px-2 py-1 text-[11px]"
+                  onClick={() => fetchInstagram()}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Sincronizando...' : 'Sincronizar ahora'}
+                </button>
               </div>
             </div>
 
@@ -197,14 +231,19 @@ export default function StalkerZone() {
                       className="text-left transition hover:opacity-90"
                     >
                       <div className="h-28 w-full overflow-hidden bg-gray-100">
-                        <Image src={post.image} alt={post.caption} className="h-full w-full object-cover" width={320} height={180} unoptimized />
+                        <Image
+                          src={post.image}
+                          alt={post.caption}
+                          className="h-full w-full object-cover"
+                          width={320}
+                          height={180}
+                          unoptimized
+                        />
                       </div>
-                      <div className="mt-2 font-vt323 text-xs text-gray-700 line-clamp-2">
+                      <div className="mt-2 line-clamp-2 font-vt323 text-xs text-gray-700">
                         {post.caption}
                       </div>
-                      <div className="font-vt323 text-[10px] text-gray-500">
-                        {formatDate(post.date)}
-                      </div>
+                      <div className="font-vt323 text-[10px] text-gray-500">{formatDate(post.date)}</div>
                     </button>
                   ))}
                 </div>
@@ -227,18 +266,15 @@ export default function StalkerZone() {
                 <div key={link.id} className="win95-input bg-white p-8 text-center">
                   <div className="text-4xl">{link.icon}</div>
                   <h3 className="mt-2 text-xl text-[#000080]">{link.label}</h3>
-                  {link.href === '#' ? (
-                    <p className="mt-2 text-sm text-gray-500">Próximamente</p>
-                  ) : (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-4 inline-block win95-button px-4 py-2 text-sm"
-                    >
-                      Abrir {link.label}
-                    </a>
-                  )}
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block win95-button px-4 py-2 text-sm"
+                  >
+                    Abrir {link.label}
+                  </a>
+                  <p className="mt-2 text-xs text-gray-500">Disponible en nueva pestaña</p>
                 </div>
               ))}
           </div>
