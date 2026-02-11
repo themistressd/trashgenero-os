@@ -82,6 +82,7 @@ Validación rápida local ejecutada en este corte:
 
 - Detección mobile + shell Trash-Mate + tema LCD + navegación inferior + modo single-app implementados (`components/mobile/TrashMateShell.tsx`, `styles/themes/trash-mate.css`, `app/(desktop)/desktop/page.tsx`).
 - Se amplió cobertura móvil incorporando más apps de contenido/interacción (incluyendo perfil/eventos/coleccionables) y accesos rápidos adicionales en la barra inferior; esta soporta overflow horizontal para mantener usabilidad, aunque aún no hay paridad 1:1 con desktop.
+- Se amplió cobertura móvil incorporando más apps de contenido/interacción; la barra inferior ahora soporta overflow horizontal para mantener usabilidad con más accesos rápidos, aunque aún no hay paridad 1:1 con desktop.
 
 ## Fase 13: Polish & Details 💅 — **Parcial (principal pendiente)**
 
