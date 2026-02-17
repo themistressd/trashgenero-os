@@ -86,18 +86,18 @@ export const DESKTOP_ICONS: DesktopIcon[] = [
   },
   {
     id: 'grimorio',
-    name: 'Grimorio.exe',
+    name: 'TRASH-ZINE.pdf',
     icon: '📖',
     route: '/apps/grimorio',
-    description: 'Blog, manifiestos y la biblia trash.',
+    description: 'Blog. Noticias, salseo y cultura trash.',
     position: { x: 140, y: 620 },
   },
   {
     id: 'transmisiones',
-    name: 'Transmisiones.exe',
+    name: 'TRASH_VISION.exe',
     icon: '📡',
     route: '/apps/transmisiones',
-    description: 'Live streams, replays y contenido exclusivo.',
+    description: 'TV estilo Winamp. Campañas y clips.',
     position: { x: 260, y: 20 },
   },
   {

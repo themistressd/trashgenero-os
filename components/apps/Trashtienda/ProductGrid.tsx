@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 import FilterBar from './FilterBar';
@@ -12,10 +12,15 @@ interface ProductGridProps {
   onProductClick: (productId: number) => void;
 }
 
+const PAGE_SIZE = 6;
+
 export default function ProductGrid({ onProductClick }: ProductGridProps) {
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [sort, setSort] = useState('default');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { categories } = useCategories();
   const { products, isLoading } = useProducts({
@@ -24,7 +29,6 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
   });
   const addItem = useCartStore((state) => state.addItem);
 
-  // Sort products
   const sortedProducts = useMemo(() => {
     const sorted = [...products];
 
@@ -36,9 +40,7 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
         sorted.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
         break;
       case 'date':
-        sorted.sort((a, b) => 
-          new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
-        );
+        sorted.sort((a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime());
         break;
       case 'popularity':
         sorted.sort((a, b) => b.total_sales - a.total_sales);
@@ -49,6 +51,49 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
 
     return sorted;
   }, [products, sort]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const scrollContainer = scrollContainerRef.current;
+    if (!sentinel || !scrollContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, sortedProducts.length));
+        }
+      },
+      {
+        root: scrollContainer,
+        rootMargin: '120px',
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [sortedProducts.length]);
+
+  const visibleProducts = sortedProducts.slice(0, visibleCount);
+  const hasMoreProducts = visibleCount < sortedProducts.length;
+
+  const resetListing = () => setVisibleCount(PAGE_SIZE);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    resetListing();
+  };
+
+  const handleCategoryChange = (value: number | null) => {
+    setCategoryId(value);
+    resetListing();
+  };
+
+  const handleSortChange = (value: string) => {
+    setSort(value);
+    resetListing();
+  };
 
   const handleQuickAdd = (product: Product) => {
     addItem({
@@ -67,37 +112,31 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Filters */}
       <div className="mb-4">
         <FilterBar
-          onSearchChange={setSearch}
-          onCategoryChange={setCategoryId}
-          onSortChange={setSort}
+          onSearchChange={handleSearchChange}
+          onCategoryChange={handleCategoryChange}
+          onSortChange={handleSortChange}
           categories={categories}
         />
       </div>
 
-      {/* Loading State */}
       {isLoading && (
         <div className="flex flex-1 items-center justify-center">
-          <div className="font-vt323 text-lg text-gray-600">
-            Cargando productos...
-          </div>
+          <div className="font-vt323 text-lg text-gray-600">Cargando productos...</div>
         </div>
       )}
 
-      {/* Empty State */}
       {!isLoading && sortedProducts.length === 0 && (
         <div className="flex flex-1 flex-col items-center justify-center gap-3">
           <span className="text-6xl">📦</span>
-          <p className="font-vt323 text-lg text-gray-600">
-            No se encontraron productos
-          </p>
+          <p className="font-vt323 text-lg text-gray-600">No se encontraron productos</p>
           <button
             onClick={() => {
               setSearch('');
               setCategoryId(null);
               setSort('default');
+              resetListing();
             }}
             className="border-2 bg-[#c0c0c0] px-4 py-2 font-vt323 text-base hover:bg-[#dfdfdf]"
             style={{
@@ -112,14 +151,14 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
         </div>
       )}
 
-      {/* Product Grid */}
       {!isLoading && sortedProducts.length > 0 && (
         <motion.div
+          ref={scrollContainerRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="grid flex-1 grid-cols-3 gap-4 overflow-auto"
         >
-          {sortedProducts.map((product) => (
+          {visibleProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -127,6 +166,12 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
               onQuickAdd={() => handleQuickAdd(product)}
             />
           ))}
+
+          {hasMoreProducts && (
+            <div ref={sentinelRef} className="col-span-3 flex justify-center py-2">
+              <span className="font-vt323 text-base text-gray-600">Cargando más productos prohibidos...</span>
+            </div>
+          )}
         </motion.div>
       )}
     </div>

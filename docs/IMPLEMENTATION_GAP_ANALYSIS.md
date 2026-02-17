@@ -1,103 +1,161 @@
 # Análisis de avance vs plan de implementación
 
-Fecha: 2026-02-11 (actualizado)
+Fecha: 2026-02-17
 
 ## Resumen ejecutivo
 
-El repositorio ya cubre la mayor parte de las fases 1-7 y una parte importante de 8-12. En términos generales:
+Tras revisar la estructura, código y estado de build del repositorio, el plan está **muy avanzado en fases 1-7**, con implementación **parcial pero funcional en 8-12**, y una **fase 13 aún incompleta**.
 
-- **Completado / muy avanzado**: Setup base, core técnico, efectos visuales, boot sequence, shell desktop, sistema de ventanas, iconos desktop, base responsive móvil.
-- **Parcial**: Apps de gamificación/e-commerce/contenido/interactive (varias listas, UIs y datos mock están implementadas, pero todavía hay integraciones o flujos incompletos).
-- **Pendiente principal**: Pulido final (QA, performance, accesibilidad avanzada) e integración real de algunos módulos que aún muestran fallback/"próximamente".
+Estado global estimado:
 
-Validación rápida local ejecutada en este corte:
+- **Completado / sólido:** Fases 1, 3, 4, 5, 7.
+- **Mayormente completado:** Fases 2, 6, 12.
+- **Parcial (con deuda funcional):** Fases 8, 9, 10, 11, 13.
+
+Validación local en este corte:
 
 - `npm run lint` ✅
 - `npm run type-check` ✅
 - `npm run build` ✅
 
-## Estado por fase
+---
+
+## Estado por fase (qué ya está y qué falta)
 
 ## Fase 1: Setup Base ⚙️ — **Completada**
 
-- Next.js 16 + TypeScript + Tailwind configurados en `package.json`, `tailwind.config.ts`, `tsconfig.json` y `postcss.config.mjs`.
-- Variables de entorno definidas en `.env.local.example`.
+Implementado:
+- Next.js 16 + TypeScript + Tailwind (`package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`).
+- Estructura de carpetas por dominios (`app/`, `components/`, `lib/`, `types/`, `styles/`).
+- Variables de entorno de referencia (`.env.local.example`).
+
+Falta:
+- Sin faltantes críticos detectados.
 
 ## Fase 2: Core Systems 🏗️ — **Mayormente completada**
 
-- Cliente API WordPress/axios implementado (`lib/api/client.ts`, `lib/api/wordpress.ts`).
-- NextAuth con JWT implementado (`app/api/auth/[...nextauth]/route.ts`).
-- Stores base en Zustand implementados (`lib/store/*`).
-- Hooks con SWR implementados (`lib/hooks/useProducts.ts`, `usePosts.ts`, `useGamification.ts`, etc.).
-- Types TypeScript definidos en `types/*`.
+Implementado:
+- Cliente WordPress con axios (`lib/api/client.ts`, `lib/api/wordpress.ts`).
+- NextAuth con JWT (`app/api/auth/[...nextauth]/route.ts`, `types/next-auth.d.ts`).
+- Stores base con Zustand (`lib/store/*`).
+- Hooks SWR para datos (`lib/hooks/*`).
+- Tipos TypeScript de dominio (`types/*`).
+
+Falta:
+- Endurecer el flujo de auth real con backend WordPress en escenarios de error y expiración.
+- Reducir dependencia de fallback local en algunos hooks de contenido.
 
 ## Fase 3: Visual Effects ✨ — **Completada**
 
-- Themes y paleta implementados (`styles/themes/trash-os.css`, `styles/themes/trash-mate.css`).
-- Efectos CRT/scanlines/glitch implementados (`styles/effects/*`, `components/effects/*`).
-- Animaciones con Framer Motion presentes (ej. ventanas/notificaciones).
+Implementado:
+- Theme system Trash OS + Trash-Mate (`styles/themes/*`).
+- CRT, scanlines, glitch y ruido (`styles/effects/*`, `components/effects/*`).
+- Animaciones con Framer Motion en shell/apps.
+
+Falta:
+- No bloqueantes funcionales; solo ajuste fino de performance visual.
 
 ## Fase 4: Boot Sequence 🚀 — **Completada**
 
-- Pantallas BIOS/Glitch/Login implementadas (`app/(boot)/*`, `components/boot/*`).
-- Auto-login y transición de arranque presentes.
+Implementado:
+- BIOS Screen, Glitch Logo y Auto-Login (`app/(boot)/*`, `components/boot/*`).
+- Flujo de transición boot → desktop activo.
+
+Falta:
+- Sin faltantes críticos detectados.
 
 ## Fase 5: Desktop Shell 🖥️ — **Completada**
 
-- Layout desktop + wallpaper + taskbar + clock + start menu implementados (`app/(desktop)/desktop/page.tsx`, `components/desktop/*`).
+Implementado:
+- Desktop layout, wallpaper, taskbar, clock/tray y start menu (`app/(desktop)/desktop/page.tsx`, `components/desktop/*`).
+
+Falta:
+- Sin faltantes críticos detectados.
 
 ## Fase 6: Window System 🪟 — **Mayormente completada**
 
-- Componente Window base + manager + z-index + min/max/close implementados (`components/desktop/Window.tsx`, `lib/store/windowStore.ts`, `lib/hooks/useWindowManager.ts`).
-- Drag & drop con `@dnd-kit` activo en el desktop (`app/(desktop)/desktop/page.tsx`).
-- Regla de permisos por rango implementada en `canAccessRoute` (`lib/constants/routes.ts`).
+Implementado:
+- Ventana base, controles min/max/close y gestión de foco/z-index (`components/desktop/Window.tsx`, `lib/store/windowStore.ts`).
+- DnD con `@dnd-kit` para interacción en desktop (`app/(desktop)/desktop/page.tsx`).
+
+Falta:
+- Refinamiento UX de snapping/límites/colisiones para ventanas complejas (nice-to-have).
 
 ## Fase 7: Desktop Icons 📂 — **Completada**
 
-- DesktopIcon, grid positioning, drag de iconos y doble click para abrir apps implementados (`components/desktop/DesktopIcon.tsx`, `app/(desktop)/desktop/page.tsx`, `lib/constants/icons.ts`).
+Implementado:
+- Componente DesktopIcon, posicionamiento en grid, drag de iconos y doble click para abrir (`components/desktop/DesktopIcon.tsx`, `lib/constants/icons.ts`).
 
-## Fase 8: Apps - Gamification 🎮 — **Parcial/Avanzada**
+Falta:
+- Sin faltantes críticos detectados.
 
-- `SectaTrash.exe` y módulos UI de rangos/progreso/inventario/logros implementados (`components/apps/SectaTrash/*`).
-- Integración GamiPress existe con fallback a mock (`lib/api/gamification.ts`).
-- Queda por robustecer integración 100% real y algunas reglas de negocio (jerarquía/rank-up final).
+## Fase 8: Apps - Gamification 🎮 — **Parcial avanzada**
 
-## Fase 9: Apps - Shop 🛍️ — **Parcial/Avanzada**
+Implementado:
+- SectaTrash con tabs, badges, progreso, inventario y modal de rank-up (`components/apps/SectaTrash/*`).
+- Integración API de gamificación existente (`lib/api/gamification.ts`).
 
-- `Trashtienda.exe`, grid, filtros, detalle, carrito, checkout implementados (`components/apps/Trashtienda/*`).
-- API WooCommerce existe, pero usa fallback mock cuando falla backend (`lib/api/woocommerce.ts`).
-- Queda hardening de checkout real end-to-end (pagos, estados finales, errores backoffice).
+Falta:
+- Integración GamiPress totalmente real (actualmente hay fallback mock ante fallos).
+- Cerrar reglas de negocio finales para jerarquía/rank-up en entorno productivo.
+
+## Fase 9: Apps - Shop 🛍️ — **Parcial avanzada**
+
+Implementado:
+- Trashtienda con grid, filtros, detalle, carrito y checkout UI (`components/apps/Trashtienda/*`, `components/apps/Carrito/Carrito.tsx`).
+- API WooCommerce integrada (`lib/api/woocommerce.ts`).
+
+Falta:
+- Checkout real end-to-end (órdenes/pago/confirmación backoffice).
+- Eliminar dependencia de productos mock cuando cae API WooCommerce.
 
 ## Fase 10: Apps - Content 📝 — **Parcial**
 
-- Varias apps de contenido existen (`MistressD`, `Divas`, `Centerfolds`, `Grimorio`, `Transmisiones`).
-- Nombres cambiados respecto al plan original (`TRASH_VISION.exe`/`TRASH-ZINE.pdf` parecen absorbidos por `Transmisiones`/`Grimorio`).
-- Validar si falta la app de video player dedicada o si quedó fusionada por decisión de producto.
+Implementado:
+- Apps de contenido existentes: `MistressD`, `Divas`, `Transmisiones`, `Grimorio`, `Centerfolds`.
+
+Falta:
+- Mapear oficialmente equivalencias con el plan original:
+  - `TRASH_VISION.exe` (video player dedicado)
+  - `TRASH-ZINE.pdf` (blog naming/entrypoint)
+- Verificar si están fusionadas por decisión de producto o aún pendientes como apps independientes.
 
 ## Fase 11: Apps - Interactive 👾 — **Parcial**
 
-- `XXXperience.zip` ya incluye una experiencia jugable base (Neon Hunt). `STsLK3R_Z0NE` ya no muestra estados "próximamente" en tabs sociales, incluye reintento manual de sincronización para Instagram y control de abort seguro en fetch; aun así mantiene fallback/mock para parte de sus datos (`components/apps/XXXperience/XXXperience.tsx`, `components/apps/StalkerZone/StalkerZone.tsx`).
+Implementado:
+- `XXXperience.zip` jugable base (`components/apps/XXXperience/XXXperience.tsx`).
+- `STsLK3R_Z0NE` con integración social y fallback controlado (`components/apps/StalkerZone/StalkerZone.tsx`).
 
-## Fase 12: Responsive (Trash-Mate) 📱 — **Avanzada**
+Falta:
+- Reducir fallback mock en social feed/perfil cuando la fuente live no responde.
+- Expandir catálogo de experiencias/juegos para cumplir expectativa de “Games” plural.
 
-- Detección mobile + shell Trash-Mate + tema LCD + navegación inferior + modo single-app implementados (`components/mobile/TrashMateShell.tsx`, `styles/themes/trash-mate.css`, `app/(desktop)/desktop/page.tsx`).
-- Se amplió cobertura móvil incorporando más apps de contenido/interacción (incluyendo perfil/eventos/coleccionables) y accesos rápidos adicionales en la barra inferior; esta soporta overflow horizontal para mantener usabilidad, aunque aún no hay paridad 1:1 con desktop.
-- Se amplió cobertura móvil incorporando más apps de contenido/interacción; la barra inferior ahora soporta overflow horizontal para mantener usabilidad con más accesos rápidos, aunque aún no hay paridad 1:1 con desktop.
+## Fase 12: Responsive (Trash-Mate) 📱 — **Mayormente completada**
+
+Implementado:
+- Detección mobile, shell Trash-Mate, tema LCD, navegación inferior y modo single-app (`components/mobile/TrashMateShell.tsx`, `styles/themes/trash-mate.css`).
+
+Falta:
+- Paridad funcional 1:1 desktop ↔ mobile en apps clave.
+- Validaciones UX extra para overflow y navegación larga en dispositivos pequeños.
 
 ## Fase 13: Polish & Details 💅 — **Parcial (principal pendiente)**
 
-- Sonidos y notificaciones existen, con toggle y utilidades (`lib/constants/sounds.ts`, `components/ui/NotificationToaster.tsx`, `components/apps/Ajustes/Ajustes.tsx`).
-- Error handling básico presente por fallbacks mock en APIs.
-- Pendiente crítico:
-  - QA en CI base ya cubierta para lint/type-check/build; falta ampliar con tests automatizados funcionales/e2e.
-  - Hardening de accesibilidad (auditoría formal).
-  - Optimización y monitoreo de performance en producción.
-  - Assets reales para audio/medios (no se detecta carpeta `public/` con recursos finales).
+Implementado:
+- Sistema base de sonidos/notificaciones y toggles (`lib/constants/sounds.ts`, `components/ui/NotificationToaster.tsx`, `components/apps/Ajustes/Ajustes.tsx`).
+- Manejo de errores básico vía fallback.
 
-## Qué queda por hacer (prioridad sugerida)
+Falta (prioridad alta):
+- Tests automatizados funcionales/e2e (hoy solo lint + type-check + build).
+- Auditoría formal de accesibilidad (teclado, contraste, lectores de pantalla).
+- Performance budget + profiling/monitoring productivo.
+- Hardening general de estados de carga/error en integraciones reales.
 
-1. **Cerrar integraciones reales** (GamiPress/WooCommerce/WordPress Auth) sin depender de mock.
-2. **Completar apps interactivas** eliminando estados “coming soon” donde aplique.
-3. **Definir y/o mapear apps faltantes del plan original** (especialmente video player/blog naming).
-4. **Expandir cobertura funcional mobile** para apps clave (paridad desktop ↔ mobile).
-5. **Polish final**: accesibilidad, performance budgets, suite de testing y pipeline CI.
+---
+
+## Backlog sugerido (orden recomendado)
+
+1. **Cerrar integraciones reales** (GamiPress, WooCommerce, WordPress Auth) minimizando mocks.
+2. **Finalizar contratos de apps del plan original** (especialmente video/blog y nomenclatura final).
+3. **Completar cobertura interactiva/móvil** para paridad real de experiencia.
+4. **Ejecutar fase de polish**: e2e, accesibilidad, performance y observabilidad.
