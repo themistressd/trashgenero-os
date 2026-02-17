@@ -7,10 +7,11 @@ export default function Home() {
   const router = useRouter()
   
   useEffect(() => {
-    // Verificar si queremos saltar la boot sequence (desde .env.local)
+    // Control de boot sequence via env vars
+    const enableBootSequence = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE !== 'false'
     const skipBoot = process.env.NEXT_PUBLIC_SKIP_BOOT === 'true'
-    
-    if (skipBoot) {
+
+    if (!enableBootSequence || skipBoot) {
       router.push('/desktop')
     } else {
       router.push('/bios')
