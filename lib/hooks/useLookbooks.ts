@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { getLookbooks } from '@/lib/api/wordpress';
+import { shouldAllowApiMockFallback } from '@/lib/config/apiFallback';
 import type { WPCustomPost } from '@/types/wordpress';
 
 const fallbackLookbooks: WPCustomPost[] = [
@@ -72,7 +73,7 @@ export const useLookbooks = () => {
   );
 
   return {
-    lookbooks: data || (error ? fallbackLookbooks : []),
+    lookbooks: data || (error && shouldAllowApiMockFallback ? fallbackLookbooks : []),
     isLoading,
     isError: error,
     refresh: mutate,

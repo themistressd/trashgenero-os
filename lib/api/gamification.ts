@@ -1,4 +1,5 @@
 import apiClient, { makeAuthenticatedRequest } from './client';
+import { resolveFallback } from '@/lib/config/apiFallback';
 import type {
   UserGamification,
   Rank,
@@ -29,8 +30,7 @@ export const getUserGamification = async (): Promise<UserGamification> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return {
+    return resolveFallback({
       points: {
         pesetrash: 0,
         estampitas: 0,
@@ -40,7 +40,7 @@ export const getUserGamification = async (): Promise<UserGamification> => {
       next_rank: null,
       can_rank_up: false,
       progress_to_next: 0,
-    };
+    }, 'GamiPress');
   }
 };
 
@@ -53,8 +53,7 @@ export const getRanks = async (): Promise<Rank[]> => {
     });
     return response.data;
   } catch {
-    // Return empty array if API fails
-    return [];
+    return resolveFallback([], 'GamiPress');
   }
 };
 
@@ -82,8 +81,7 @@ export const getPointsHistory = async (
     });
     return response.data;
   } catch {
-    // Return empty array if API fails
-    return [];
+    return resolveFallback([], 'GamiPress');
   }
 };
 
@@ -152,8 +150,7 @@ export const getUserAchievements = async (): Promise<Achievement[]> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return [
+    return resolveFallback([
       {
         id: 1,
         title: 'Primera Bruja',
@@ -197,7 +194,7 @@ export const getUserAchievements = async (): Promise<Achievement[]> => {
         unlocked: false,
         points_awarded: 100,
       },
-    ];
+    ], 'GamiPress');
   }
 };
 
@@ -210,8 +207,7 @@ export const getUserStats = async (): Promise<UserStats> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return {
+    return resolveFallback({
       total_points_earned: 5420,
       challenges_completed: 28,
       achievements_unlocked: 15,
@@ -219,7 +215,7 @@ export const getUserStats = async (): Promise<UserStats> => {
       current_streak: 7,
       total_purchases: 3,
       total_spent: 89.99,
-    };
+    }, 'GamiPress');
   }
 };
 
@@ -233,8 +229,7 @@ export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return [
+    return resolveFallback([
       {
         id: 1,
         type: 'points',
@@ -273,7 +268,7 @@ export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         icon: '🪙',
       },
-    ];
+    ], 'GamiPress');
   }
 };
 

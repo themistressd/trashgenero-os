@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { getDivas, getDivaTypes } from '@/lib/api/wordpress';
+import { shouldAllowApiMockFallback } from '@/lib/config/apiFallback';
 import type { WPCustomPost, WPTerm } from '@/types/wordpress';
 
 const fallbackDivas: WPCustomPost[] = [
@@ -85,7 +86,7 @@ export const useDivas = () => {
   );
 
   return {
-    divas: data || (error ? fallbackDivas : []),
+    divas: data || (error && shouldAllowApiMockFallback ? fallbackDivas : []),
     isLoading,
     isError: error,
     refresh: mutate,
@@ -103,7 +104,7 @@ export const useDivaTypes = () => {
   );
 
   return {
-    types: data || (error ? fallbackTypes : []),
+    types: data || (error && shouldAllowApiMockFallback ? fallbackTypes : []),
     isLoading,
     isError: error,
     refresh: mutate,

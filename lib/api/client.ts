@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { shouldAllowApiMockFallback } from '@/lib/config/apiFallback';
 
-const baseURL = process.env.NEXT_PUBLIC_WP_API_URL || '/api/mock';
+const baseURL = process.env.NEXT_PUBLIC_WP_API_URL || (shouldAllowApiMockFallback ? '/api/mock' : '/wp-json');
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

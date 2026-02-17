@@ -1,4 +1,5 @@
 import { makeAuthenticatedRequest } from './client';
+import { resolveFallback } from '@/lib/config/apiFallback';
 import type { Product, Cart, Order, CheckoutData } from '@/types/woocommerce';
 
 /**
@@ -325,7 +326,7 @@ export const getProducts = async (params?: {
       filtered = filtered.filter(p => p.on_sale);
     }
     
-    return filtered;
+    return resolveFallback(filtered, 'WooCommerce');
   }
 };
 
@@ -342,7 +343,7 @@ export const getProductById = async (productId: number): Promise<Product> => {
     if (!product) {
       throw new Error(`Product ${productId} not found`);
     }
-    return product;
+    return resolveFallback(product, 'WooCommerce');
   }
 };
 
@@ -355,7 +356,7 @@ export const getCategories = async (): Promise<Array<{ id: number; name: string;
     });
   } catch (error) {
     console.warn('WooCommerce API unavailable, using mock data', error);
-    return MOCK_CATEGORIES;
+    return resolveFallback(MOCK_CATEGORIES, 'WooCommerce');
   }
 };
 
@@ -368,7 +369,7 @@ export const getCart = async (): Promise<Cart> => {
     });
   } catch (error) {
     console.warn('WooCommerce cart API unavailable, using empty cart', error);
-    return createEmptyCart();
+    return resolveFallback(createEmptyCart(), 'WooCommerce');
   }
 };
 
@@ -424,7 +425,7 @@ export const createOrder = async (checkoutData: CheckoutData): Promise<Order> =>
     });
   } catch (error) {
     console.warn('WooCommerce order API unavailable, using mock order', error);
-    return createMockOrder(checkoutData);
+    return resolveFallback(createMockOrder(checkoutData), 'WooCommerce');
   }
 };
 
@@ -437,7 +438,7 @@ export const getOrderById = async (orderId: number): Promise<Order> => {
     });
   } catch (error) {
     console.warn('WooCommerce order API unavailable, returning synthetic order', error);
-    return createMockOrder({
+    return resolveFallback(createMockOrder({
       billing: {
         first_name: 'Invitada',
         last_name: 'Trash',
@@ -464,7 +465,7 @@ export const getOrderById = async (orderId: number): Promise<Order> => {
       payment_method_title: 'Mock',
       set_paid: false,
       line_items: [],
-    }, orderId);
+    }, orderId), 'WooCommerce');
   }
 };
 
@@ -484,6 +485,6 @@ export const getUserOrders = async (params?: {
     });
   } catch (error) {
     console.warn('WooCommerce orders API unavailable, returning empty history', error);
-    return [];
+    return resolveFallback([], 'WooCommerce');
   }
 };
