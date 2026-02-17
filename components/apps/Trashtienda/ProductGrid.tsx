@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 import FilterBar from './FilterBar';
@@ -13,9 +13,12 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ onProductClick }: ProductGridProps) {
+  const PAGE_SIZE = 6;
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [sort, setSort] = useState('default');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const { categories } = useCategories();
   const { products, isLoading } = useProducts({
@@ -50,6 +53,46 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
     return sorted;
   }, [products, sort]);
 
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, sortedProducts.length));
+        }
+      },
+      {
+        root: null,
+        rootMargin: '200px',
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [sortedProducts.length]);
+
+  const visibleProducts = sortedProducts.slice(0, visibleCount);
+  const hasMoreProducts = visibleCount < sortedProducts.length;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const handleCategoryChange = (value: number | null) => {
+    setCategoryId(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSort(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
   const handleQuickAdd = (product: Product) => {
     addItem({
       key: String(product.id),
@@ -70,9 +113,9 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
       {/* Filters */}
       <div className="mb-4">
         <FilterBar
-          onSearchChange={setSearch}
-          onCategoryChange={setCategoryId}
-          onSortChange={setSort}
+          onSearchChange={handleSearchChange}
+          onCategoryChange={handleCategoryChange}
+          onSortChange={handleSortChange}
           categories={categories}
         />
       </div>
@@ -98,6 +141,7 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
               setSearch('');
               setCategoryId(null);
               setSort('default');
+              setVisibleCount(PAGE_SIZE);
             }}
             className="border-2 bg-[#c0c0c0] px-4 py-2 font-vt323 text-base hover:bg-[#dfdfdf]"
             style={{
@@ -119,7 +163,7 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
           animate={{ opacity: 1 }}
           className="grid flex-1 grid-cols-3 gap-4 overflow-auto"
         >
-          {sortedProducts.map((product) => (
+          {visibleProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -127,6 +171,12 @@ export default function ProductGrid({ onProductClick }: ProductGridProps) {
               onQuickAdd={() => handleQuickAdd(product)}
             />
           ))}
+
+          {hasMoreProducts && (
+            <div ref={sentinelRef} className="col-span-3 flex justify-center py-2">
+              <span className="font-vt323 text-base text-gray-600">Cargando más productos prohibidos...</span>
+            </div>
+          )}
         </motion.div>
       )}
     </div>
