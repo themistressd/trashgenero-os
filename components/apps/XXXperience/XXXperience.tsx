@@ -19,26 +19,107 @@ const statusStyles: Record<GameStatus, string> = {
 };
 
 const SYMBOLS = ['🧿', '💾', '⚡', '🔮', '🪙', '🃏', '💎', '✨'];
+const ROULETTE_PRIZES = ['+20 pesetrash', '+1 estampita', '+1 reliquia', '+50 pesetrash', 'Bonus x2', 'Nada (glitch)'];
 
 export default function XXXperience() {
   const [search, setSearch] = useState('');
   const [activeGame, setActiveGame] = useState<GameModule | null>(null);
   const [lockMessage, setLockMessage] = useState('');
+
   const [targetIndex, setTargetIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const [round, setRound] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+
+  const [rouletteIndex, setRouletteIndex] = useState(0);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [rouletteResult, setRouletteResult] = useState<string | null>(null);
+  const [glitchHits, setGlitchHits] = useState(0);
+  const [easterUnlocked, setEasterUnlocked] = useState(false);
+  const [secretClaimed, setSecretClaimed] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { bestScore?: number };
+      return parsed.bestScore || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [totalSpins, setTotalSpins] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { totalSpins?: number };
+      return parsed.totalSpins || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [secretClaims, setSecretClaims] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { secretClaims?: number };
+      return parsed.secretClaims || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [cheatBuffer, setCheatBuffer] = useState('');
+  const [cheatActivated, setCheatActivated] = useState(false);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const spinTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      if (spinTimerRef.current) {
+        clearInterval(spinTimerRef.current);
+      }
     };
   }, []);
 
+
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (activeGame?.id !== 'xp-05') return;
+      if (event.key.length !== 1) return;
+
+      const next = `${cheatBuffer}${event.key.toUpperCase()}`.slice(-6);
+      setCheatBuffer(next);
+
+      if (next === 'GLITCH') {
+        setEasterUnlocked(true);
+        setCheatActivated(true);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [activeGame?.id, cheatBuffer]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    localStorage.setItem(
+      'xxxperience-stats',
+      JSON.stringify({
+        bestScore,
+        totalSpins,
+        secretClaims,
+      })
+    );
+  }, [bestScore, totalSpins, secretClaims]);
   const games = useMemo<GameModule[]>(
     () => [
       {
@@ -73,6 +154,14 @@ export default function XXXperience() {
         icon: '🔦',
         reward: '+80 pesetrash',
       },
+      {
+        id: 'xp-05',
+        title: 'Caos Roulette',
+        description: 'Gira la ruleta ritual y recibe recompensas aleatorias.',
+        status: 'live',
+        icon: '🎰',
+        reward: 'Premio aleatorio',
+      },
     ],
     []
   );
@@ -93,7 +182,6 @@ export default function XXXperience() {
     [round, score]
   );
 
-
   const openGame = (game: GameModule) => {
     if (game.status === 'locked') {
       setLockMessage('🔒 Este juego sigue bloqueado hasta el siguiente rango ritual.');
@@ -109,12 +197,23 @@ export default function XXXperience() {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    if (spinTimerRef.current) {
+      clearInterval(spinTimerRef.current);
+      spinTimerRef.current = null;
+    }
     setActiveGame(null);
     setIsRunning(false);
     setRound(0);
     setTimeLeft(30);
     setScore(0);
     setTargetIndex(0);
+    setRouletteResult(null);
+    setIsSpinning(false);
+    setGlitchHits(0);
+    setEasterUnlocked(false);
+    setSecretClaimed(false);
+    setCheatBuffer('');
+    setCheatActivated(false);
   };
 
   const startNeonHunt = () => {
@@ -136,11 +235,59 @@ export default function XXXperience() {
             timerRef.current = null;
           }
           setIsRunning(false);
+          setBestScore((currentBest) => Math.max(currentBest, score));
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+  };
+
+  const spinRoulette = () => {
+    if (isSpinning) return;
+
+    setIsSpinning(true);
+    setRouletteResult(null);
+    setTotalSpins((prev) => prev + 1);
+
+    const spins = Math.floor(Math.random() * 14) + 18;
+    let currentStep = 0;
+
+    if (spinTimerRef.current) {
+      clearInterval(spinTimerRef.current);
+    }
+
+    spinTimerRef.current = setInterval(() => {
+      setRouletteIndex((prev) => (prev + 1) % ROULETTE_PRIZES.length);
+      currentStep += 1;
+
+      if (currentStep >= spins) {
+        if (spinTimerRef.current) {
+          clearInterval(spinTimerRef.current);
+          spinTimerRef.current = null;
+        }
+
+        setRouletteIndex((finalIndex) => {
+          const result = ROULETTE_PRIZES[finalIndex];
+          setRouletteResult(result);
+
+          if (result === 'Nada (glitch)') {
+            setGlitchHits((prev) => {
+              const next = prev + 1;
+              if (next >= 3) {
+                setEasterUnlocked(true);
+              }
+              return next;
+            });
+          } else {
+            setGlitchHits(0);
+          }
+
+          return finalIndex;
+        });
+        setIsSpinning(false);
+      }
+    }, 110);
   };
 
   const onHuntClick = (symbol: string) => {
@@ -169,6 +316,12 @@ export default function XXXperience() {
       return 'Ya está jugable: pulsa Iniciar ritual para empezar una partida corta.';
     }
 
+    if (game.id === 'xp-05') {
+      return easterUnlocked
+        ? 'Easter egg desbloqueado: reclama la reliquia secreta del glitch.'
+        : 'Ruleta activa: pulsa Girar ruleta para caos y premio aleatorio.';
+    }
+
     return 'Disponible para jugar desde la app. Próxima iteración: guardar scoring en backend.';
   };
 
@@ -194,6 +347,19 @@ export default function XXXperience() {
         />
       </div>
 
+
+
+      <div className="grid gap-2 rounded border-2 border-[#808080] bg-[#dfdfdf] p-3 font-vt323 text-xs text-gray-700 md:grid-cols-3">
+        <div>
+          Best score Neon Hunt: <strong>{bestScore}</strong>
+        </div>
+        <div>
+          Giros de ruleta: <strong>{totalSpins}</strong>
+        </div>
+        <div>
+          Reliquias secretas reclamadas: <strong>{secretClaims}</strong>
+        </div>
+      </div>
 
       {lockMessage && (
         <div className="win95-input bg-white p-2 font-vt323 text-xs text-[#7c2d12]">
@@ -297,6 +463,80 @@ export default function XXXperience() {
                   >
                     {isRunning ? 'Reiniciar ritual' : 'Iniciar ritual'}
                   </button>
+                </div>
+              )}
+
+              {activeGame.id === 'xp-05' && activeGame.status === 'live' && (
+                <div className="mt-4 rounded border-2 border-[#808080] bg-[#f5f5f5] p-4">
+                  <div className="mb-3 font-vt323 text-sm text-gray-700">Ritual de ruleta del caos</div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {ROULETTE_PRIZES.map((prize, index) => (
+                      <div
+                        key={prize}
+                        className={`rounded border px-2 py-2 text-center font-vt323 text-xs ${
+                          index === rouletteIndex
+                            ? 'border-[#000080] bg-[#dbeafe] text-[#000080]'
+                            : 'border-[#808080] bg-white text-gray-700'
+                        }`}
+                      >
+                        {prize}
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={spinRoulette}
+                    className="mt-4 win95-button px-3 py-1 font-vt323"
+                    disabled={isSpinning}
+                  >
+                    {isSpinning ? 'Girando...' : 'Girar ruleta'}
+                  </button>
+
+                  {rouletteResult && (
+                    <div className="mt-3 font-vt323 text-sm text-purple-700">
+                      Resultado: <strong>{rouletteResult}</strong>
+                    </div>
+                  )}
+
+                  <div className="mt-2 font-vt323 text-xs text-gray-600">
+                    Glitches consecutivos: <strong>{glitchHits}</strong>/3
+                  </div>
+
+                  <div className="mt-1 font-vt323 text-[11px] text-gray-500">
+                    Tip secreto: escribe <strong>GLITCH</strong> en teclado para forzar el portal oculto.
+                  </div>
+
+                  {cheatActivated && (
+                    <div className="mt-2 font-vt323 text-xs text-[#000080]">
+                      Código GLITCH aceptado ✓ Portal desbloqueado manualmente.
+                    </div>
+                  )}
+
+                  {easterUnlocked && (
+                    <div className="mt-3 rounded border-2 border-[#000080] bg-[#eef2ff] p-3">
+                      <div className="font-vt323 text-sm text-[#000080]">
+                        🕳️ EASTER EGG: ARCHIVO OCULTO DESBLOQUEADO
+                      </div>
+                      <div className="mt-1 font-vt323 text-xs text-gray-700">
+                        Has invocado 3 glitches seguidos. Recompensa secreta disponible.
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!secretClaimed) {
+                            setSecretClaims((prev) => prev + 1);
+                          }
+                          setSecretClaimed(true);
+                        }}
+                        className="mt-2 win95-button px-3 py-1 font-vt323 text-sm"
+                        disabled={secretClaimed}
+                      >
+                        {secretClaimed ? 'Reliquia reclamada ✓' : 'Reclamar reliquia secreta'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
