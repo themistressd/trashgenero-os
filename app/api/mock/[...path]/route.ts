@@ -37,6 +37,30 @@ const MOCK_POSTS = [
     categories: [],
     tags: [],
   },
+  {
+    id: 2,
+    date: '2024-02-10',
+    date_gmt: '',
+    guid: { rendered: '' },
+    modified: '',
+    modified_gmt: '',
+    slug: 'manual-de-glitches',
+    status: 'publish',
+    type: 'post',
+    link: '',
+    title: { rendered: 'Manual de Glitches' },
+    content: { rendered: '<p>Recetas para distorsionar la realidad con estilo.</p>', protected: false },
+    excerpt: { rendered: '<p>Recetas para distorsionar la realidad.</p>', protected: false },
+    author: 0,
+    featured_media: 0,
+    comment_status: 'closed',
+    ping_status: 'closed',
+    sticky: false,
+    template: '',
+    format: 'standard',
+    categories: [],
+    tags: [],
+  },
 ];
 
 const MOCK_DIVAS = [
@@ -67,6 +91,33 @@ const MOCK_DIVAS = [
     categories: [],
     tags: [],
   },
+  {
+    id: 2,
+    date: '',
+    date_gmt: '',
+    guid: { rendered: '' },
+    modified: '',
+    modified_gmt: '',
+    slug: 'diva-analogica',
+    status: 'publish',
+    type: 'divas',
+    link: '',
+    title: { rendered: 'Diva Analógica' },
+    content: {
+      rendered: '<p>Reina de las cintas VHS y los secretos grabados.</p>',
+      protected: false,
+    },
+    excerpt: { rendered: '<p>Reina de las cintas VHS.</p>', protected: false },
+    author: 0,
+    featured_media: 0,
+    comment_status: 'closed',
+    ping_status: 'closed',
+    sticky: false,
+    template: '',
+    format: 'standard',
+    categories: [],
+    tags: [],
+  },
 ];
 
 const MOCK_LOOKBOOKS = [
@@ -84,6 +135,30 @@ const MOCK_LOOKBOOKS = [
     title: { rendered: 'Centerfold Neón' },
     content: { rendered: '<p>Editorial retrofuturista.</p>', protected: false },
     excerpt: { rendered: '<p>Editorial retrofuturista.</p>', protected: false },
+    author: 0,
+    featured_media: 0,
+    comment_status: 'closed',
+    ping_status: 'closed',
+    sticky: false,
+    template: '',
+    format: 'standard',
+    categories: [],
+    tags: [],
+  },
+  {
+    id: 2,
+    date: '',
+    date_gmt: '',
+    guid: { rendered: '' },
+    modified: '',
+    modified_gmt: '',
+    slug: 'centerfold-vcr',
+    status: 'publish',
+    type: 'lookbook',
+    link: '',
+    title: { rendered: 'Centerfold VCR' },
+    content: { rendered: '<p>Un archivo perdido de cintas glam.</p>', protected: false },
+    excerpt: { rendered: '<p>Archivo perdido de cintas glam.</p>', protected: false },
     author: 0,
     featured_media: 0,
     comment_status: 'closed',
@@ -130,11 +205,89 @@ const MOCK_PRODUCTS = [
     stock_status: 'instock',
     stock_quantity: 50,
   },
+  {
+    id: 2,
+    name: 'Sudadera Suprema Trashtornada',
+    slug: 'sudadera-suprema',
+    permalink: '#',
+    date_created: '2024-01-02',
+    date_modified: '2024-01-02',
+    type: 'simple',
+    status: 'publish',
+    featured: true,
+    description: 'Sudadera oversized con el logo Suprema Trashtornada.',
+    short_description: 'Sudadera oversized premium',
+    sku: 'TRASH-002',
+    price: '65.00',
+    regular_price: '75.00',
+    sale_price: '65.00',
+    on_sale: true,
+    purchasable: true,
+    total_sales: 28,
+    virtual: false,
+    downloadable: false,
+    categories: [{ id: 1, name: 'Ropa', slug: 'ropa' }],
+    tags: [{ id: 2, name: 'Descuento', slug: 'descuento' }],
+    images: [{ id: 2, src: 'https://via.placeholder.com/800x800/9333EA/FFFFFF?text=Suprema+Hoodie', name: 'Sudadera Suprema', alt: 'Sudadera Suprema Trashtornada' }],
+    attributes: [],
+    stock_status: 'instock',
+    stock_quantity: 30,
+  },
+  {
+    id: 3,
+    name: 'Accesorio Látex Místico',
+    slug: 'accesorio-latex',
+    permalink: '#',
+    date_created: '2024-01-03',
+    date_modified: '2024-01-03',
+    type: 'simple',
+    status: 'publish',
+    featured: false,
+    description: 'Accesorio de látex hecho a mano.',
+    short_description: 'Accesorio látex artesanal',
+    sku: 'TRASH-003',
+    price: '28.00',
+    regular_price: '28.00',
+    sale_price: '',
+    on_sale: false,
+    purchasable: true,
+    total_sales: 15,
+    virtual: false,
+    downloadable: false,
+    categories: [{ id: 2, name: 'Accesorios', slug: 'accesorios' }],
+    tags: [],
+    images: [{ id: 3, src: 'https://via.placeholder.com/800x800/000000/FF00FF?text=Latex+Mystic', name: 'Accesorio Látex', alt: 'Accesorio Látex Místico' }],
+    attributes: [],
+    stock_status: 'instock',
+    stock_quantity: 20,
+  },
 ];
 
 const MOCK_CATEGORIES = [
-  { id: 1, name: 'Ropa', slug: 'ropa', count: 1 },
+  { id: 1, name: 'Ropa', slug: 'ropa', count: 2 },
+  { id: 2, name: 'Accesorios', slug: 'accesorios', count: 1 },
 ];
+
+const toPositiveNumber = (value: string | null, fallback: number): number => {
+  if (!value) return fallback;
+  const parsed = Number(value);
+  if (Number.isNaN(parsed) || parsed <= 0) return fallback;
+  return parsed;
+};
+
+const paginate = <T>(items: T[], request: NextRequest): T[] => {
+  const perPage = toPositiveNumber(request.nextUrl.searchParams.get('per_page'), items.length || 1);
+  const page = toPositiveNumber(request.nextUrl.searchParams.get('page'), 1);
+  const start = (page - 1) * perPage;
+  return items.slice(start, start + perPage);
+};
+
+const parseBoolean = (value: string | null): boolean | null => {
+  if (value === null) return null;
+  if (value === 'true' || value === '1') return true;
+  if (value === 'false' || value === '0') return false;
+  return null;
+};
 
 export async function GET(
   request: NextRequest,
@@ -155,7 +308,10 @@ export async function GET(
     return NextResponse.json({ success: true, data: [] });
   }
 
-  if (joinedPath === 'wp/v2/posts') return NextResponse.json(MOCK_POSTS);
+  if (joinedPath === 'wp/v2/posts') {
+    return NextResponse.json(paginate(MOCK_POSTS, request));
+  }
+
   if (/^wp\/v2\/posts\/\d+$/.test(joinedPath)) {
     const id = Number(path[path.length - 1]);
     const post = MOCK_POSTS.find((item) => item.id === id);
@@ -164,8 +320,8 @@ export async function GET(
       : NextResponse.json({ message: `Post ${id} not found` }, { status: 404 });
   }
 
-  if (joinedPath === 'wp/v2/divas') return NextResponse.json(MOCK_DIVAS);
-  if (joinedPath === 'wp/v2/lookbook') return NextResponse.json(MOCK_LOOKBOOKS);
+  if (joinedPath === 'wp/v2/divas') return NextResponse.json(paginate(MOCK_DIVAS, request));
+  if (joinedPath === 'wp/v2/lookbook') return NextResponse.json(paginate(MOCK_LOOKBOOKS, request));
   if (joinedPath === 'wp/v2/tipo-diva') return NextResponse.json(MOCK_DIVA_TYPES);
   if (joinedPath === 'wp/v2/pages') {
     const slug = request.nextUrl.searchParams.get('slug');
@@ -195,7 +351,40 @@ export async function GET(
     ]);
   }
 
-  if (joinedPath === 'wc/v3/products') return NextResponse.json(MOCK_PRODUCTS);
+  if (joinedPath === 'wc/v3/products') {
+    let products = [...MOCK_PRODUCTS];
+    const category = request.nextUrl.searchParams.get('category');
+    const search = request.nextUrl.searchParams.get('search')?.toLowerCase();
+    const featured = parseBoolean(request.nextUrl.searchParams.get('featured'));
+    const onSale = parseBoolean(request.nextUrl.searchParams.get('on_sale'));
+
+    if (category) {
+      const categoryId = Number(category);
+      if (!Number.isNaN(categoryId)) {
+        products = products.filter((product) =>
+          product.categories.some((productCategory) => productCategory.id === categoryId)
+        );
+      }
+    }
+
+    if (search) {
+      products = products.filter((product) =>
+        product.name.toLowerCase().includes(search) ||
+        product.description.toLowerCase().includes(search)
+      );
+    }
+
+    if (featured !== null) {
+      products = products.filter((product) => product.featured === featured);
+    }
+
+    if (onSale !== null) {
+      products = products.filter((product) => product.on_sale === onSale);
+    }
+
+    return NextResponse.json(paginate(products, request));
+  }
+
   if (joinedPath === 'wc/v3/products/categories') return NextResponse.json(MOCK_CATEGORIES);
   if (/^wc\/v3\/products\/\d+$/.test(joinedPath)) {
     const id = Number(path[path.length - 1]);
