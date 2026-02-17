@@ -15,6 +15,15 @@ import type {
 } from '@/types/gamification';
 
 const namespace = process.env.NEXT_PUBLIC_GAMIPRESS_API_NAMESPACE || 'trashgenero/v1';
+const isProduction = process.env.NODE_ENV === 'production';
+const allowMockFallback = process.env.NEXT_PUBLIC_ALLOW_API_MOCKS === 'true' || !isProduction;
+
+const fallbackOrThrow = <T>(fallbackValue: T): T => {
+  if (allowMockFallback) {
+    return fallbackValue;
+  }
+  throw new Error('GamiPress API unavailable and mock fallback is disabled in production.');
+};
 
 /**
  * GamiPress API client
@@ -29,8 +38,7 @@ export const getUserGamification = async (): Promise<UserGamification> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return {
+    return fallbackOrThrow({
       points: {
         pesetrash: 0,
         estampitas: 0,
@@ -40,7 +48,7 @@ export const getUserGamification = async (): Promise<UserGamification> => {
       next_rank: null,
       can_rank_up: false,
       progress_to_next: 0,
-    };
+    });
   }
 };
 
@@ -53,8 +61,7 @@ export const getRanks = async (): Promise<Rank[]> => {
     });
     return response.data;
   } catch {
-    // Return empty array if API fails
-    return [];
+    return fallbackOrThrow([]);
   }
 };
 
@@ -82,8 +89,7 @@ export const getPointsHistory = async (
     });
     return response.data;
   } catch {
-    // Return empty array if API fails
-    return [];
+    return fallbackOrThrow([]);
   }
 };
 
@@ -152,8 +158,7 @@ export const getUserAchievements = async (): Promise<Achievement[]> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return [
+    return fallbackOrThrow([
       {
         id: 1,
         title: 'Primera Bruja',
@@ -197,7 +202,7 @@ export const getUserAchievements = async (): Promise<Achievement[]> => {
         unlocked: false,
         points_awarded: 100,
       },
-    ];
+    ]);
   }
 };
 
@@ -210,8 +215,7 @@ export const getUserStats = async (): Promise<UserStats> => {
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return {
+    return fallbackOrThrow({
       total_points_earned: 5420,
       challenges_completed: 28,
       achievements_unlocked: 15,
@@ -219,7 +223,7 @@ export const getUserStats = async (): Promise<UserStats> => {
       current_streak: 7,
       total_purchases: 3,
       total_spent: 89.99,
-    };
+    });
   }
 };
 
@@ -233,8 +237,7 @@ export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog
     });
     return response.data;
   } catch {
-    // Return mock data if API fails
-    return [
+    return fallbackOrThrow([
       {
         id: 1,
         type: 'points',
@@ -273,7 +276,7 @@ export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         icon: '🪙',
       },
-    ];
+    ]);
   }
 };
 
