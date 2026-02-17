@@ -1,161 +1,113 @@
-# Análisis de avance vs plan de implementación
+# Análisis de brechas de implementación para funcionamiento correcto
 
 Fecha: 2026-02-17
 
 ## Resumen ejecutivo
 
-Tras revisar la estructura, código y estado de build del repositorio, el plan está **muy avanzado en fases 1-7**, con implementación **parcial pero funcional en 8-12**, y una **fase 13 aún incompleta**.
+El repositorio es **ejecutable y estable a nivel técnico** (lint, type-check y build pasan), pero para un funcionamiento "correcto" en entorno real todavía depende de varios fallbacks mock y de integraciones incompletas de negocio.
 
-Estado global estimado:
+**Conclusión corta:**
+- Núcleo visual/arquitectónico: ✅ sólido.
+- Integraciones reales (auth, contenido, shop, gamificación): ⚠️ parciales.
+- Calidad de entrega productiva (tests e2e, accesibilidad, performance observability): ⚠️ pendiente.
 
-- **Completado / sólido:** Fases 1, 3, 4, 5, 7.
-- **Mayormente completado:** Fases 2, 6, 12.
-- **Parcial (con deuda funcional):** Fases 8, 9, 10, 11, 13.
-
-Validación local en este corte:
-
+Validación local:
 - `npm run lint` ✅
 - `npm run type-check` ✅
 - `npm run build` ✅
 
 ---
 
-## Estado por fase (qué ya está y qué falta)
+## Qué falta por implementar (prioridad alta)
 
-## Fase 1: Setup Base ⚙️ — **Completada**
+## 1) Integraciones backend "reales" sin dependencia de mock
 
-Implementado:
-- Next.js 16 + TypeScript + Tailwind (`package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`).
-- Estructura de carpetas por dominios (`app/`, `components/`, `lib/`, `types/`, `styles/`).
-- Variables de entorno de referencia (`.env.local.example`).
+### Falta
+- Reducir o eliminar fallback mock en contenido WordPress (páginas/posts/divas/lookbooks).
+- Eliminar fallback de catálogo WooCommerce en producción (hoy hace degradación a mock products).
+- Completar integración GamiPress real en todos los endpoints y estados de error.
+- Endurecer autenticación real con WordPress/NextAuth para expiración/errores de sesión.
 
-Falta:
-- Sin faltantes críticos detectados.
+### Evidencia en código
+- Hooks con fallback local de contenido:
+  - `lib/hooks/usePage.ts`
+  - `lib/hooks/usePosts.ts`
+  - `lib/hooks/useDivas.ts`
+  - `lib/hooks/useLookbooks.ts`
+- WooCommerce con productos mock y warnings de fallback:
+  - `lib/api/woocommerce.ts`
+- Gamificación con retorno mock cuando falla API:
+  - `lib/api/gamification.ts`
+- Cliente API con base URL mock por defecto (`/api/mock`) si no hay env:
+  - `lib/api/client.ts`
 
-## Fase 2: Core Systems 🏗️ — **Mayormente completada**
+## 2) Flujo e-commerce end-to-end
 
-Implementado:
-- Cliente WordPress con axios (`lib/api/client.ts`, `lib/api/wordpress.ts`).
-- NextAuth con JWT (`app/api/auth/[...nextauth]/route.ts`, `types/next-auth.d.ts`).
-- Stores base con Zustand (`lib/store/*`).
-- Hooks SWR para datos (`lib/hooks/*`).
-- Tipos TypeScript de dominio (`types/*`).
+### Falta
+- Checkout transaccional real: creación de orden, pago, estados de orden y confirmación sincronizada con backoffice.
+- Manejo robusto de errores de checkout (reintentos, errores de pasarela, recuperación de carrito).
 
-Falta:
-- Endurecer el flujo de auth real con backend WordPress en escenarios de error y expiración.
-- Reducir dependencia de fallback local en algunos hooks de contenido.
+### Evidencia en código
+- UI de tienda/carrito/checkout implementada en:
+  - `components/apps/Trashtienda/*`
+  - `components/apps/Carrito/Carrito.tsx`
+- Integración API base en `lib/api/woocommerce.ts`, pero con fallback a mock en fallos.
 
-## Fase 3: Visual Effects ✨ — **Completada**
+## 3) Paridad funcional desktop ↔ móvil
 
-Implementado:
-- Theme system Trash OS + Trash-Mate (`styles/themes/*`).
-- CRT, scanlines, glitch y ruido (`styles/effects/*`, `components/effects/*`).
-- Animaciones con Framer Motion en shell/apps.
+### Falta
+- Cerrar diferencias funcionales entre Trash OS (desktop) y Trash-Mate (móvil), especialmente en apps con flujos largos.
+- Validar UX de overflow, navegación y estados vacíos/error en pantallas pequeñas.
 
-Falta:
-- No bloqueantes funcionales; solo ajuste fino de performance visual.
+### Evidencia en código
+- Shell móvil existe (`components/mobile/TrashMateShell.tsx`) pero no hay matriz de paridad funcional documentada por app.
 
-## Fase 4: Boot Sequence 🚀 — **Completada**
+## 4) Contrato final de apps y nomenclatura de producto
 
-Implementado:
-- BIOS Screen, Glitch Logo y Auto-Login (`app/(boot)/*`, `components/boot/*`).
-- Flujo de transición boot → desktop activo.
+### Falta
+- Definir oficialmente si apps planificadas (p. ej. video player/blog dedicados) están fusionadas en apps actuales o siguen pendientes como módulos separados.
 
-Falta:
-- Sin faltantes críticos detectados.
+### Evidencia
+- README y estructura actual muestran apps de contenido implementadas, pero no existe documento de "scope final" que cierre equivalencias contra el plan original.
 
-## Fase 5: Desktop Shell 🖥️ — **Completada**
+## 5) Calidad productiva (fase de polish)
 
-Implementado:
-- Desktop layout, wallpaper, taskbar, clock/tray y start menu (`app/(desktop)/desktop/page.tsx`, `components/desktop/*`).
+### Falta
+- Suite de tests automatizados funcionales/e2e (no hay scripts de test en `package.json`).
+- Auditoría de accesibilidad (teclado, contraste, semántica, lectores de pantalla).
+- Presupuesto y monitoreo de performance en producción (Core Web Vitals, alertas).
+- Estrategia uniforme de observabilidad y errores (logging/metrics/tracing).
 
-Falta:
-- Sin faltantes críticos detectados.
-
-## Fase 6: Window System 🪟 — **Mayormente completada**
-
-Implementado:
-- Ventana base, controles min/max/close y gestión de foco/z-index (`components/desktop/Window.tsx`, `lib/store/windowStore.ts`).
-- DnD con `@dnd-kit` para interacción en desktop (`app/(desktop)/desktop/page.tsx`).
-
-Falta:
-- Refinamiento UX de snapping/límites/colisiones para ventanas complejas (nice-to-have).
-
-## Fase 7: Desktop Icons 📂 — **Completada**
-
-Implementado:
-- Componente DesktopIcon, posicionamiento en grid, drag de iconos y doble click para abrir (`components/desktop/DesktopIcon.tsx`, `lib/constants/icons.ts`).
-
-Falta:
-- Sin faltantes críticos detectados.
-
-## Fase 8: Apps - Gamification 🎮 — **Parcial avanzada**
-
-Implementado:
-- SectaTrash con tabs, badges, progreso, inventario y modal de rank-up (`components/apps/SectaTrash/*`).
-- Integración API de gamificación existente (`lib/api/gamification.ts`).
-
-Falta:
-- Integración GamiPress totalmente real (actualmente hay fallback mock ante fallos).
-- Cerrar reglas de negocio finales para jerarquía/rank-up en entorno productivo.
-
-## Fase 9: Apps - Shop 🛍️ — **Parcial avanzada**
-
-Implementado:
-- Trashtienda con grid, filtros, detalle, carrito y checkout UI (`components/apps/Trashtienda/*`, `components/apps/Carrito/Carrito.tsx`).
-- API WooCommerce integrada (`lib/api/woocommerce.ts`).
-
-Falta:
-- Checkout real end-to-end (órdenes/pago/confirmación backoffice).
-- Eliminar dependencia de productos mock cuando cae API WooCommerce.
-
-## Fase 10: Apps - Content 📝 — **Parcial**
-
-Implementado:
-- Apps de contenido existentes: `MistressD`, `Divas`, `Transmisiones`, `Grimorio`, `Centerfolds`.
-
-Falta:
-- Mapear oficialmente equivalencias con el plan original:
-  - `TRASH_VISION.exe` (video player dedicado)
-  - `TRASH-ZINE.pdf` (blog naming/entrypoint)
-- Verificar si están fusionadas por decisión de producto o aún pendientes como apps independientes.
-
-## Fase 11: Apps - Interactive 👾 — **Parcial**
-
-Implementado:
-- `XXXperience.zip` jugable base (`components/apps/XXXperience/XXXperience.tsx`).
-- `STsLK3R_Z0NE` con integración social y fallback controlado (`components/apps/StalkerZone/StalkerZone.tsx`).
-
-Falta:
-- Reducir fallback mock en social feed/perfil cuando la fuente live no responde.
-- Expandir catálogo de experiencias/juegos para cumplir expectativa de “Games” plural.
-
-## Fase 12: Responsive (Trash-Mate) 📱 — **Mayormente completada**
-
-Implementado:
-- Detección mobile, shell Trash-Mate, tema LCD, navegación inferior y modo single-app (`components/mobile/TrashMateShell.tsx`, `styles/themes/trash-mate.css`).
-
-Falta:
-- Paridad funcional 1:1 desktop ↔ mobile en apps clave.
-- Validaciones UX extra para overflow y navegación larga en dispositivos pequeños.
-
-## Fase 13: Polish & Details 💅 — **Parcial (principal pendiente)**
-
-Implementado:
-- Sistema base de sonidos/notificaciones y toggles (`lib/constants/sounds.ts`, `components/ui/NotificationToaster.tsx`, `components/apps/Ajustes/Ajustes.tsx`).
-- Manejo de errores básico vía fallback.
-
-Falta (prioridad alta):
-- Tests automatizados funcionales/e2e (hoy solo lint + type-check + build).
-- Auditoría formal de accesibilidad (teclado, contraste, lectores de pantalla).
-- Performance budget + profiling/monitoring productivo.
-- Hardening general de estados de carga/error en integraciones reales.
+### Evidencia
+- `package.json` incluye `lint`, `type-check`, `build`, pero no scripts de test.
 
 ---
 
-## Backlog sugerido (orden recomendado)
+## Qué ya está bien implementado
 
-1. **Cerrar integraciones reales** (GamiPress, WooCommerce, WordPress Auth) minimizando mocks.
-2. **Finalizar contratos de apps del plan original** (especialmente video/blog y nomenclatura final).
-3. **Completar cobertura interactiva/móvil** para paridad real de experiencia.
-4. **Ejecutar fase de polish**: e2e, accesibilidad, performance y observabilidad.
+- Base técnica moderna con Next.js + TypeScript + Tailwind y arquitectura modular clara.
+- Boot sequence, desktop shell, sistema de ventanas e iconos funcionales.
+- Efectos visuales y theming consolidados.
+- Build de producción compila correctamente.
+
+---
+
+## Plan recomendado (orden de ejecución)
+
+1. **Integraciones reales primero:** WordPress auth + GamiPress + WooCommerce sin fallback mock en producción.
+2. **Checkout completo:** orden/pago/confirmación + recuperación ante errores.
+3. **Paridad móvil:** checklist por app y corrección de gaps UX.
+4. **Polish de release:** e2e + a11y + performance + observabilidad.
+5. **Cierre de alcance:** documento de equivalencias entre plan original y apps finales.
+
+---
+
+## Definición práctica de "funcionamiento correcto"
+
+Se recomienda considerar el proyecto listo cuando cumpla simultáneamente:
+
+- Sin dependencia de mocks en producción para flujos críticos (auth, shop, gamificación).
+- Checkout real con transacción verificable.
+- Cobertura mínima automatizada (smoke e2e + regresión crítica).
+- A11y básica aprobada y monitoreo de performance activo.
+- Paridad funcional aceptable entre desktop y móvil en las apps core.
