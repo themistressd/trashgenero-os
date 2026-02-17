@@ -120,7 +120,7 @@ export const SOUNDS: Record<string, SoundConfig> = {
   glitch: {
     id: 'glitch',
     name: 'Glitch',
-    path: '/sounds/effects/glitch.mp3',
+    path: '',
     volume: 0.5,
   },
   static: {
@@ -146,11 +146,37 @@ export const preloadSounds = (soundIds: string[]): void => {
 
   soundIds.forEach((id) => {
     const sound = getSoundById(id);
-    if (sound) {
-      const audio = new Audio(sound.path);
-      audio.preload = 'auto';
-    }
+    if (!sound?.path) return;
+
+    const audio = new Audio(sound.path);
+    audio.preload = 'auto';
   });
+};
+
+const playGeneratedGlitch = (volume: number): void => {
+  const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  const audioContext = new AudioContextClass();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(140, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.18);
+
+  gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(Math.max(0.01, volume * 0.25), audioContext.currentTime + 0.02);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.2);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.22);
+  oscillator.onended = () => {
+    void audioContext.close();
+  };
 };
 
 /**
@@ -168,8 +194,17 @@ export const playSound = (id: string, options?: { volume?: number }): void => {
   const sound = getSoundById(id);
   if (!sound) return;
 
+  const volume = options?.volume ?? sound.volume ?? 0.5;
+
+  if (id === 'glitch' && !sound.path) {
+    playGeneratedGlitch(volume);
+    return;
+  }
+
+  if (!sound.path) return;
+
   const audio = new Audio(sound.path);
-  audio.volume = options?.volume ?? sound.volume ?? 0.5;
+  audio.volume = volume;
   audio.play().catch((error) => {
     console.warn(`Failed to play sound ${id}:`, error);
   });

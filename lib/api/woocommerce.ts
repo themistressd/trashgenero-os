@@ -219,6 +219,59 @@ const MOCK_PRODUCTS: Product[] = [
   },
 ];
 
+
+const createEmptyCart = (): Cart => ({
+  items: [],
+  items_count: 0,
+  items_weight: 0,
+  needs_payment: false,
+  needs_shipping: false,
+  subtotal: '0',
+  subtotal_tax: '0',
+  total: '0',
+  total_tax: '0',
+  shipping_total: '0',
+  shipping_tax: '0',
+  discount_total: '0',
+  discount_tax: '0',
+});
+
+const createMockOrder = (checkoutData: CheckoutData, orderId?: number): Order => {
+  const now = new Date().toISOString();
+  const line_items = checkoutData.line_items.map((item, index) => {
+    const product = MOCK_PRODUCTS.find((p) => p.id === item.product_id);
+    const price = parseFloat(product?.price || '0');
+    const subtotal = (price * item.quantity).toFixed(2);
+
+    return {
+      id: index + 1,
+      name: product?.name || `Producto ${item.product_id}`,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      subtotal,
+      total: subtotal,
+      price,
+    };
+  });
+
+  const subtotalValue = line_items.reduce((acc, item) => acc + Number(item.total), 0).toFixed(2);
+
+  return {
+    id: orderId ?? Date.now(),
+    parent_id: 0,
+    status: 'pending',
+    currency: 'EUR',
+    date_created: now,
+    date_modified: now,
+    total: subtotalValue,
+    subtotal: subtotalValue,
+    total_tax: '0.00',
+    line_items,
+    billing: checkoutData.billing,
+    shipping: checkoutData.shipping,
+  };
+};
+
 const MOCK_CATEGORIES = [
   { id: 1, name: 'Ropa', slug: 'ropa', count: 2 },
   { id: 2, name: 'Accesorios', slug: 'accesorios', count: 2 },
@@ -308,10 +361,15 @@ export const getCategories = async (): Promise<Array<{ id: number; name: string;
 
 // Get cart
 export const getCart = async (): Promise<Cart> => {
-  return makeAuthenticatedRequest<Cart>({
-    method: 'GET',
-    url: '/wc/store/v1/cart',
-  });
+  try {
+    return await makeAuthenticatedRequest<Cart>({
+      method: 'GET',
+      url: '/wc/store/v1/cart',
+    });
+  } catch (error) {
+    console.warn('WooCommerce cart API unavailable, using empty cart', error);
+    return createEmptyCart();
+  }
 };
 
 // Add item to cart
@@ -358,19 +416,56 @@ export const clearCart = async (): Promise<Cart> => {
 
 // Create order
 export const createOrder = async (checkoutData: CheckoutData): Promise<Order> => {
-  return makeAuthenticatedRequest<Order>({
-    method: 'POST',
-    url: '/wc/v3/orders',
-    data: checkoutData,
-  });
+  try {
+    return await makeAuthenticatedRequest<Order>({
+      method: 'POST',
+      url: '/wc/v3/orders',
+      data: checkoutData,
+    });
+  } catch (error) {
+    console.warn('WooCommerce order API unavailable, using mock order', error);
+    return createMockOrder(checkoutData);
+  }
 };
 
 // Get order by ID
 export const getOrderById = async (orderId: number): Promise<Order> => {
-  return makeAuthenticatedRequest<Order>({
-    method: 'GET',
-    url: `/wc/v3/orders/${orderId}`,
-  });
+  try {
+    return await makeAuthenticatedRequest<Order>({
+      method: 'GET',
+      url: `/wc/v3/orders/${orderId}`,
+    });
+  } catch (error) {
+    console.warn('WooCommerce order API unavailable, returning synthetic order', error);
+    return createMockOrder({
+      billing: {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        email: 'mock@trashgenero.local',
+        phone: '',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+      shipping: {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+      payment_method: 'mock',
+      payment_method_title: 'Mock',
+      set_paid: false,
+      line_items: [],
+    }, orderId);
+  }
 };
 
 // Get user orders
@@ -378,12 +473,17 @@ export const getUserOrders = async (params?: {
   per_page?: number;
   page?: number;
 }): Promise<Order[]> => {
-  return makeAuthenticatedRequest<Order[]>({
-    method: 'GET',
-    url: '/wc/v3/orders',
-    params: {
-      ...params,
-      customer: 'me',
-    },
-  });
+  try {
+    return await makeAuthenticatedRequest<Order[]>({
+      method: 'GET',
+      url: '/wc/v3/orders',
+      params: {
+        ...params,
+        customer: 'me',
+      },
+    });
+  } catch (error) {
+    console.warn('WooCommerce orders API unavailable, returning empty history', error);
+    return [];
+  }
 };
