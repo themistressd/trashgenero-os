@@ -148,3 +148,10 @@ Fecha: 2026-02-17
 - Se ajustó `lib/api/client.ts` para que el fallback `/api/mock` solo aplique cuando está permitido por entorno (`NODE_ENV`) o flag explícito (`NEXT_PUBLIC_ALLOW_API_MOCKS`).
 - Se ajustó `lib/api/gamification.ts` para que los mocks no oculten fallos en producción cuando los fallbacks están deshabilitados.
 - Se documentó `NEXT_PUBLIC_ALLOW_API_MOCKS` en `.env.local.example` y README para un control explícito del comportamiento en dev/prod.
+
+
+## Actualización aplicada (iteración 2)
+
+- Se creó `lib/config/apiFallback.ts` para centralizar la política de fallback por entorno (`NEXT_PUBLIC_ALLOW_API_MOCKS` + `NODE_ENV`).
+- Se aplicó esa política a `lib/api/woocommerce.ts`, evitando degradaciones silenciosas en producción para catálogo, carrito y órdenes.
+- Se aplicó la misma política en hooks de contenido (`usePage`, `usePosts`, `useDivas`, `useLookbooks`) para no inyectar contenido mock automáticamente cuando los fallbacks están deshabilitados.

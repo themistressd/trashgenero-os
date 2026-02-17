@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { getPosts } from '@/lib/api/wordpress';
+import { shouldAllowApiMockFallback } from '@/lib/config/apiFallback';
 import type { WPPost } from '@/types/wordpress';
 
 const fallbackPosts: WPPost[] = [
@@ -102,7 +103,7 @@ export const usePosts = (params?: {
   );
 
   return {
-    posts: data || (error ? fallbackPosts : []),
+    posts: data || (error && shouldAllowApiMockFallback ? fallbackPosts : []),
     isLoading,
     isError: error,
     refresh: mutate,

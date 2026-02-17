@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { getPageBySlug } from '@/lib/api/wordpress';
+import { shouldAllowApiMockFallback } from '@/lib/config/apiFallback';
 import type { WPPage } from '@/types/wordpress';
 
 const fallbackPage: WPPage = {
@@ -41,7 +42,7 @@ export const usePage = (slug: string) => {
   );
 
   return {
-    page: data || (error ? fallbackPage : null),
+    page: data || (error && shouldAllowApiMockFallback ? fallbackPage : null),
     isLoading,
     isError: error,
     refresh: mutate,
