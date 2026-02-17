@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_WP_API_URL || 'http://localhost:3000/api/mock';
+const baseURL = process.env.NEXT_PUBLIC_WP_API_URL || '/api/mock';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
