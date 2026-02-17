@@ -24,6 +24,7 @@
 
 ## Ajustes aplicados
 
+- Se amplió el mock local para cubrir endpoints base de WordPress/WooCommerce (`wp/v2/posts`, `wp/v2/divas`, `wp/v2/lookbook`, `wp/v2/tipo-diva`, `wp/v2/pages`, `wc/v3/products`, `wc/v3/products/categories`, `wc/v3/products/{id}`).
 - Home ahora respeta ambos flags:
   - `NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE=false` => entra directo a `/desktop`.
   - `NEXT_PUBLIC_SKIP_BOOT=true` => entra directo a `/desktop`.
@@ -35,6 +36,5 @@
 ## Pendientes recomendados
 
 - Para plataformas que bloquean binarios en PR, mantener sonidos críticos como síntesis en runtime o alojados externamente.
-- Extender `app/api/mock/[...path]/route.ts` para cubrir endpoints de WordPress/WooCommerce si se desea modo totalmente offline sin 404 de red.
 - Agregar los demás assets de sonido definidos en `lib/constants/sounds.ts` para evitar futuros 404 cuando se usen otros eventos.
 - Añadir un checklist de variables obligatorias vs opcionales en README para primer arranque.
