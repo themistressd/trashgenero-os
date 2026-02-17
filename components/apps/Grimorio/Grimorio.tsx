@@ -24,7 +24,7 @@ export default function Grimorio() {
   return (
     <div className="flex h-full flex-col gap-4 bg-[#c0c0c0] p-4">
       <div className="border-b-2 border-[#808080] pb-3">
-        <div className="font-vcr text-2xl text-bubblegum-pink">Grimorio.exe</div>
+        <div className="font-vcr text-2xl text-bubblegum-pink">TRASH-ZINE.pdf</div>
         <div className="font-vt323 text-sm text-gray-700">Archivo de textos, manifiestos y notas.</div>
       </div>
 
