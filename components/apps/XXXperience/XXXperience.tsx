@@ -71,6 +71,8 @@ export default function XXXperience() {
       return 0;
     }
   });
+  const [cheatBuffer, setCheatBuffer] = useState('');
+  const [cheatActivated, setCheatActivated] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spinTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -85,6 +87,26 @@ export default function XXXperience() {
       }
     };
   }, []);
+
+
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (activeGame?.id !== 'xp-05') return;
+      if (event.key.length !== 1) return;
+
+      const next = `${cheatBuffer}${event.key.toUpperCase()}`.slice(-6);
+      setCheatBuffer(next);
+
+      if (next === 'GLITCH') {
+        setEasterUnlocked(true);
+        setCheatActivated(true);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [activeGame?.id, cheatBuffer]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -191,6 +213,8 @@ export default function XXXperience() {
     setGlitchHits(0);
     setEasterUnlocked(false);
     setSecretClaimed(false);
+    setCheatBuffer('');
+    setCheatActivated(false);
   };
 
   const startNeonHunt = () => {
@@ -323,6 +347,19 @@ export default function XXXperience() {
           placeholder="Filtra por título..."
         />
       </div>
+
+      <div className="grid gap-2 rounded border-2 border-[#808080] bg-[#dfdfdf] p-3 font-vt323 text-xs text-gray-700 md:grid-cols-3">
+        <div>
+          Best score Neon Hunt: <strong>{bestScore}</strong>
+        </div>
+        <div>
+          Giros de ruleta: <strong>{totalSpins}</strong>
+        </div>
+        <div>
+          Reliquias secretas reclamadas: <strong>{secretClaims}</strong>
+        </div>
+      </div>
+
 
       <div className="grid gap-2 rounded border-2 border-[#808080] bg-[#dfdfdf] p-3 font-vt323 text-xs text-gray-700 md:grid-cols-3">
         <div>
@@ -478,6 +515,16 @@ export default function XXXperience() {
                   <div className="mt-2 font-vt323 text-xs text-gray-600">
                     Glitches consecutivos: <strong>{glitchHits}</strong>/3
                   </div>
+
+                  <div className="mt-1 font-vt323 text-[11px] text-gray-500">
+                    Tip secreto: escribe <strong>GLITCH</strong> en teclado para forzar el portal oculto.
+                  </div>
+
+                  {cheatActivated && (
+                    <div className="mt-2 font-vt323 text-xs text-[#000080]">
+                      Código GLITCH aceptado ✓ Portal desbloqueado manualmente.
+                    </div>
+                  )}
 
                   {easterUnlocked && (
                     <div className="mt-3 rounded border-2 border-[#000080] bg-[#eef2ff] p-3">
