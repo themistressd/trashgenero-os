@@ -15,9 +15,9 @@ Fecha: 2026-02-17
 - ✅ Next.js 16 + TypeScript configurados.
 - ✅ Tailwind CSS configurado.
 - ✅ Dependencias principales instaladas.
-- 🟡 Variables de entorno documentadas en README, pero no hay `.env.local.example` en el repo para bootstrap directo.
+- ✅ Variables de entorno documentadas y archivo `.env.local.example` disponible para bootstrap.
 
-**Veredicto fase 1: 🟡 Parcial (95%)**
+**Veredicto fase 1: ✅ Implementado (100%)**
 
 ### FASE 2: Core Systems 🏗️
 - ✅ Cliente API con axios (`lib/api/client.ts`).
@@ -25,7 +25,7 @@ Fecha: 2026-02-17
 - ✅ Stores Zustand básicos (boot, desktop/window, carrito, notificaciones).
 - ✅ Hooks SWR para contenido/gamificación/shop.
 - ✅ Tipos TypeScript de dominio (`types/*`).
-- 🟡 Persisten fallbacks mock como ruta por defecto del API client (`/api/mock`) y degradación en varias integraciones.
+- 🟡 Persisten degradaciones/fallbacks en algunas integraciones, pero ahora quedan condicionados por entorno/flag para no enmascarar errores en producción.
 
 **Veredicto fase 2: 🟡 Parcial (85%)**
 
@@ -128,16 +128,23 @@ Fecha: 2026-02-17
 
 ## Resumen global
 
-- **Fases completas**: 4, 5, 6, 7, 11, 12.
-- **Fases parciales**: 1, 2, 3, 8, 9, 10, 13.
+- **Fases completas**: 1, 4, 5, 6, 7, 11, 12.
+- **Fases parciales**: 2, 3, 8, 9, 10, 13.
 - **Bloqueador principal para “producción real”**: dependencia de fallbacks mock en integraciones críticas (auth/contenido/gamificación/shop) + ausencia de suite de testing automatizado.
 
 ## Top 7 pendientes (prioridad)
 
 1. Endurecer integraciones reales WordPress/WooCommerce/GamiPress y limitar mocks solo a desarrollo.
 2. Cerrar checkout transaccional real (estado de orden/pago, errores de pasarela, recuperación).
-3. Añadir `.env.local.example` consistente con variables actuales.
-4. Definir y ejecutar smoke e2e de flujos core (boot, login, abrir app, compra, gamificación).
-5. Auditoría mínima de accesibilidad (teclado, foco, contraste, labels).
-6. Definir observabilidad/performance (CWV + error tracking).
-7. Documentar “equivalencias de alcance” entre nombres del plan original y apps finales implementadas.
+3. Definir y ejecutar smoke e2e de flujos core (boot, login, abrir app, compra, gamificación).
+4. Auditoría mínima de accesibilidad (teclado, foco, contraste, labels).
+5. Definir observabilidad/performance (CWV + error tracking).
+6. Documentar “equivalencias de alcance” entre nombres del plan original y apps finales implementadas.
+7. Endurecer también WooCommerce/WordPress para aplicar la misma política anti-fallback silencioso en producción.
+
+
+## Actualización aplicada (inicio de ejecución)
+
+- Se ajustó `lib/api/client.ts` para que el fallback `/api/mock` solo aplique cuando está permitido por entorno (`NODE_ENV`) o flag explícito (`NEXT_PUBLIC_ALLOW_API_MOCKS`).
+- Se ajustó `lib/api/gamification.ts` para que los mocks no oculten fallos en producción cuando los fallbacks están deshabilitados.
+- Se documentó `NEXT_PUBLIC_ALLOW_API_MOCKS` en `.env.local.example` y README para un control explícito del comportamiento en dev/prod.

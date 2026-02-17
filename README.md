@@ -153,6 +153,8 @@ trashgenero-os/
 ```env
 NEXT_PUBLIC_WP_API_URL=https://your-wordpress-site.com/wp-json
 JWT_SECRET_KEY=your-jwt-secret
+# Solo para desarrollo/local: habilita fallbacks mock cuando no hay backend
+NEXT_PUBLIC_ALLOW_API_MOCKS=true
 ```
 
 ### WooCommerce
