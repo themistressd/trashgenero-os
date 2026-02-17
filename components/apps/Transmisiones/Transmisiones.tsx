@@ -64,7 +64,7 @@ export default function Transmisiones() {
     <div className="flex h-full flex-col gap-4 bg-[#c0c0c0] p-4">
       <div className="border-b-2 border-[#808080] pb-3">
         <div className="font-vcr text-2xl text-bubblegum-pink">TRASH_VISION.exe</div>
-        <div className="font-vt323 text-sm text-gray-700">TV Player estilo Winamp: campañas y clips.</div>
+        <div className="font-vt323 text-sm text-gray-700">TV Player estilo Winamp: campañas y clips en vivo, replays y contenido exclusivo.</div>
       </div>
 
       <div className="border-2 border-[#808080] bg-[#dfdfdf] p-3">
