@@ -38,6 +38,39 @@ export default function XXXperience() {
   const [glitchHits, setGlitchHits] = useState(0);
   const [easterUnlocked, setEasterUnlocked] = useState(false);
   const [secretClaimed, setSecretClaimed] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { bestScore?: number };
+      return parsed.bestScore || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [totalSpins, setTotalSpins] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { totalSpins?: number };
+      return parsed.totalSpins || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [secretClaims, setSecretClaims] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    try {
+      const raw = localStorage.getItem('xxxperience-stats');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { secretClaims?: number };
+      return parsed.secretClaims || 0;
+    } catch {
+      return 0;
+    }
+  });
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spinTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -52,6 +85,19 @@ export default function XXXperience() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    localStorage.setItem(
+      'xxxperience-stats',
+      JSON.stringify({
+        bestScore,
+        totalSpins,
+        secretClaims,
+      })
+    );
+  }, [bestScore, totalSpins, secretClaims]);
 
   const games = useMemo<GameModule[]>(
     () => [
@@ -166,6 +212,7 @@ export default function XXXperience() {
             timerRef.current = null;
           }
           setIsRunning(false);
+          setBestScore((currentBest) => Math.max(currentBest, score));
           return 0;
         }
         return prev - 1;
@@ -178,6 +225,7 @@ export default function XXXperience() {
 
     setIsSpinning(true);
     setRouletteResult(null);
+    setTotalSpins((prev) => prev + 1);
 
     const spins = Math.floor(Math.random() * 14) + 18;
     let currentStep = 0;
@@ -274,6 +322,18 @@ export default function XXXperience() {
           className="win95-input flex-1"
           placeholder="Filtra por título..."
         />
+      </div>
+
+      <div className="grid gap-2 rounded border-2 border-[#808080] bg-[#dfdfdf] p-3 font-vt323 text-xs text-gray-700 md:grid-cols-3">
+        <div>
+          Best score Neon Hunt: <strong>{bestScore}</strong>
+        </div>
+        <div>
+          Giros de ruleta: <strong>{totalSpins}</strong>
+        </div>
+        <div>
+          Reliquias secretas reclamadas: <strong>{secretClaims}</strong>
+        </div>
       </div>
 
       {lockMessage && (
@@ -429,7 +489,12 @@ export default function XXXperience() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => setSecretClaimed(true)}
+                        onClick={() => {
+                          if (!secretClaimed) {
+                            setSecretClaims((prev) => prev + 1);
+                          }
+                          setSecretClaimed(true);
+                        }}
                         className="mt-2 win95-button px-3 py-1 font-vt323 text-sm"
                         disabled={secretClaimed}
                       >
