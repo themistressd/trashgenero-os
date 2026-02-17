@@ -33,6 +33,24 @@ interface InstagramEdge {
   node: InstagramEdgeNode;
 }
 
+const socialMeta: Record<Exclude<TabKey, 'instagram'>, { handle: string; status: string; tagline: string }> = {
+  tiktok: {
+    handle: '@trashgnero',
+    status: 'Contenido corto / clips diarios',
+    tagline: 'Caos coreografiado en vertical.',
+  },
+  onlyfans: {
+    handle: '@trashgnero',
+    status: 'Archivo premium / backstage',
+    tagline: 'Contenido exclusivo y detrás de escena.',
+  },
+  twitter: {
+    handle: '@trashgnero',
+    status: 'Noticias / salseo / alerts',
+    tagline: 'Feed DOS para announcements y drama.',
+  },
+};
+
 const mockProfile: InstagramProfile = {
   username: '@trashgnero',
   followers: '12.4k',
@@ -91,6 +109,7 @@ export default function StalkerZone() {
   const [hasError, setHasError] = useState(false);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
   const [dataSource, setDataSource] = useState<DataSource>('mock');
+  const [copiedHandle, setCopiedHandle] = useState<string | null>(null);
 
   const fetchInstagram = useCallback(async (signal?: AbortSignal) => {
     let wasAborted = false;
@@ -147,10 +166,21 @@ export default function StalkerZone() {
     return () => controller.abort();
   }, [fetchInstagram]);
 
-  const socialButtons = useMemo(
-    () => SOCIAL_LINKS.filter((link) => link.id !== 'instagram'),
-    []
+  const socialButtons = useMemo(() => SOCIAL_LINKS.filter((link) => link.id !== 'instagram'), []);
+  const activeSocialLink = useMemo(
+    () => socialButtons.find((link) => link.id === activeTab),
+    [activeTab, socialButtons]
   );
+
+  const handleCopy = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedHandle(value);
+      setTimeout(() => setCopiedHandle(null), 1200);
+    } catch {
+      setCopiedHandle(null);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col bg-[#c0c0c0]">
@@ -244,9 +274,7 @@ export default function StalkerZone() {
                           unoptimized
                         />
                       </div>
-                      <div className="mt-2 line-clamp-2 font-vt323 text-xs text-gray-700">
-                        {post.caption}
-                      </div>
+                      <div className="mt-2 line-clamp-2 font-vt323 text-xs text-gray-700">{post.caption}</div>
                       <div className="font-vt323 text-[10px] text-gray-500">{formatDate(post.date)}</div>
                     </button>
                   ))}
@@ -262,25 +290,54 @@ export default function StalkerZone() {
           </div>
         )}
 
-        {activeTab !== 'instagram' && (
-          <div className="flex h-full flex-col items-center justify-center gap-6 font-vt323">
-            {socialButtons
-              .filter((link) => link.id === activeTab)
-              .map((link) => (
-                <div key={link.id} className="win95-input bg-white p-8 text-center">
-                  <div className="text-4xl">{link.icon}</div>
-                  <h3 className="mt-2 text-xl text-[#000080]">{link.label}</h3>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 inline-block win95-button px-4 py-2 text-sm"
-                  >
-                    Abrir {link.label}
-                  </a>
-                  <p className="mt-2 text-xs text-gray-500">Disponible en nueva pestaña</p>
-                </div>
-              ))}
+        {activeTab !== 'instagram' && activeSocialLink && (
+          <div className="grid h-full gap-4 md:grid-cols-2">
+            <div className="win95-input bg-white p-6">
+              <div className="text-4xl">{activeSocialLink.icon}</div>
+              <h3 className="mt-2 font-vcr text-xl text-[#000080]">{activeSocialLink.label}</h3>
+              <p className="mt-1 font-vt323 text-sm text-gray-700">{socialMeta[activeTab].tagline}</p>
+
+              <div className="mt-4 border-2 border-[#808080] bg-[#f2f2f2] p-3 font-vt323 text-sm">
+                <div className="text-[11px] uppercase text-gray-500">Handle</div>
+                <div className="text-[#000080]">{socialMeta[activeTab].handle}</div>
+              </div>
+
+              <div className="mt-2 border-2 border-[#808080] bg-[#f2f2f2] p-3 font-vt323 text-sm">
+                <div className="text-[11px] uppercase text-gray-500">Estado</div>
+                <div className="text-gray-700">{socialMeta[activeTab].status}</div>
+              </div>
+            </div>
+
+            <div className="win95-input bg-white p-6 font-vt323">
+              <div className="font-vcr text-lg text-[#000080]">SOCIAL DOS PANEL</div>
+              <p className="mt-2 text-sm text-gray-700">Acceso rápido al canal oficial con acciones del sistema.</p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href={activeSocialLink.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="win95-button px-4 py-2 text-sm"
+                >
+                  Abrir {activeSocialLink.label}
+                </a>
+                <button
+                  type="button"
+                  className="win95-button px-4 py-2 text-sm"
+                  onClick={() => handleCopy(socialMeta[activeTab].handle)}
+                >
+                  Copiar handle
+                </button>
+              </div>
+
+              <div className="mt-4 border-2 border-dashed border-[#808080] bg-[#f8f8f8] p-3 text-xs text-gray-600">
+                URL: {activeSocialLink.href}
+              </div>
+
+              {copiedHandle === socialMeta[activeTab].handle && (
+                <div className="mt-3 text-xs text-green-700">Handle copiado al portapapeles ✓</div>
+              )}
+            </div>
           </div>
         )}
       </div>
