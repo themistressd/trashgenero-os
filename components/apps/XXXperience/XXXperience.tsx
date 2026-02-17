@@ -86,8 +86,6 @@ export default function XXXperience() {
     };
   }, []);
 
-
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -100,6 +98,7 @@ export default function XXXperience() {
       })
     );
   }, [bestScore, totalSpins, secretClaims]);
+
   const games = useMemo<GameModule[]>(
     () => [
       {
@@ -324,8 +323,6 @@ export default function XXXperience() {
           placeholder="Filtra por título..."
         />
       </div>
-
-
 
       <div className="grid gap-2 rounded border-2 border-[#808080] bg-[#dfdfdf] p-3 font-vt323 text-xs text-gray-700 md:grid-cols-3">
         <div>
