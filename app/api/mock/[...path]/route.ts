@@ -268,6 +268,22 @@ const MOCK_CATEGORIES = [
   { id: 2, name: 'Accesorios', slug: 'accesorios', count: 1 },
 ];
 
+const EMPTY_CART = {
+  items: [],
+  items_count: 0,
+  items_weight: 0,
+  needs_payment: false,
+  needs_shipping: false,
+  subtotal: '0',
+  subtotal_tax: '0',
+  total: '0',
+  total_tax: '0',
+  shipping_total: '0',
+  shipping_tax: '0',
+  discount_total: '0',
+  discount_tax: '0',
+};
+
 const toPositiveNumber = (value: string | null, fallback: number): number => {
   if (!value) return fallback;
   const parsed = Number(value);
@@ -386,12 +402,107 @@ export async function GET(
   }
 
   if (joinedPath === 'wc/v3/products/categories') return NextResponse.json(MOCK_CATEGORIES);
+  if (joinedPath === 'wc/store/v1/cart') return NextResponse.json(EMPTY_CART);
+  if (joinedPath === 'wc/v3/orders') return NextResponse.json([]);
+  if (/^wc\/v3\/orders\/\d+$/.test(joinedPath)) {
+    const id = Number(path[path.length - 1]);
+    return NextResponse.json({
+      id,
+      parent_id: 0,
+      status: 'pending',
+      currency: 'EUR',
+      date_created: new Date().toISOString(),
+      date_modified: new Date().toISOString(),
+      total: '0.00',
+      subtotal: '0.00',
+      total_tax: '0.00',
+      line_items: [],
+      billing: {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        email: 'mock@trashgenero.local',
+        phone: '',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+      shipping: {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+    });
+  }
   if (/^wc\/v3\/products\/\d+$/.test(joinedPath)) {
     const id = Number(path[path.length - 1]);
     const product = MOCK_PRODUCTS.find((item) => item.id === id);
     return product
       ? NextResponse.json(product)
       : NextResponse.json({ message: `Product ${id} not found` }, { status: 404 });
+  }
+
+  return NextResponse.json(
+    {
+      success: false,
+      message: `Mock endpoint not implemented: ${joinedPath}`,
+    },
+    { status: 404 }
+  );
+}
+
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) {
+  const { path } = await context.params;
+  const joinedPath = path.join('/');
+
+  if (joinedPath === 'wc/v3/orders') {
+    const body = await request.json().catch(() => ({}));
+    const lineItems = Array.isArray(body?.line_items) ? body.line_items : [];
+
+    return NextResponse.json({
+      id: Date.now(),
+      parent_id: 0,
+      status: 'pending',
+      currency: 'EUR',
+      date_created: new Date().toISOString(),
+      date_modified: new Date().toISOString(),
+      total: '0.00',
+      subtotal: '0.00',
+      total_tax: '0.00',
+      line_items: lineItems,
+      billing: body?.billing ?? {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        email: 'mock@trashgenero.local',
+        phone: '',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+      shipping: body?.shipping ?? {
+        first_name: 'Invitada',
+        last_name: 'Trash',
+        address_1: '',
+        address_2: '',
+        city: '',
+        state: '',
+        postcode: '',
+        country: 'ES',
+      },
+    });
   }
 
   return NextResponse.json(
