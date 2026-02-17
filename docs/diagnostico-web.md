@@ -24,6 +24,9 @@
 
 ## Ajustes aplicados
 
+- Se añadieron fallbacks de WooCommerce para `getCart` (carrito vacío) y `createOrder` (pedido sintético), evitando errores de checkout en local/offline cuando no hay backend real.
+- Se amplió el mock local para cubrir endpoints base de WordPress/WooCommerce (`wp/v2/posts`, `wp/v2/divas`, `wp/v2/lookbook`, `wp/v2/tipo-diva`, `wp/v2/pages`, `wc/v3/products`, `wc/v3/products/categories`, `wc/v3/products/{id}`).
+- El endpoint mock de productos ahora respeta filtros comunes (`category`, `search`, `featured`, `on_sale`) y paginación (`per_page`, `page`) para aproximar mejor el comportamiento real.
 - Se amplió el mock local para cubrir endpoints base de WordPress/WooCommerce (`wp/v2/posts`, `wp/v2/divas`, `wp/v2/lookbook`, `wp/v2/tipo-diva`, `wp/v2/pages`, `wc/v3/products`, `wc/v3/products/categories`, `wc/v3/products/{id}`).
 - Home ahora respeta ambos flags:
   - `NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE=false` => entra directo a `/desktop`.
