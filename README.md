@@ -230,6 +230,16 @@ El sistema usa mock data cuando las APIs no están disponibles. Los errores de A
 - Se añadió `POST /api/telemetry/web-vitals` para recibir métricas desde cliente.
 - Valida payload mínimo (`id`, `name`, `value`) y registra evento estructurado en servidor.
 - Está pensado como baseline para luego conectar proveedor externo de observabilidad.
+- Si defines `NEXT_PUBLIC_WEB_VITALS_ENDPOINT`, se enviarán por `navigator.sendBeacon`.
+- Si no defines endpoint, en desarrollo se registran en consola (`[web-vitals]`).
+
+---
+
+## 📌 Documentos de seguimiento
+
+- [Auditoría de implementación](docs/PLAN_IMPLEMENTACION_AUDITORIA_2026-02-17.md)
+- [Análisis de brechas](docs/IMPLEMENTATION_GAP_ANALYSIS.md)
+- [Matriz de equivalencias de alcance](docs/SCOPE_EQUIVALENCE_MATRIX.md)
 
 ---
 
