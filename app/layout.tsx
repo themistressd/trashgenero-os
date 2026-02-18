@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "@/styles/themes/trash-os.css";
 import "@/styles/themes/trash-mate.css";
+import WebVitalsReporter from "@/components/telemetry/WebVitalsReporter";
 
 export const metadata: Metadata = {
   title: "TrashGènero OS - Digital Witchcraft meets Windows 95",
@@ -25,6 +26,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased" suppressHydrationWarning>
         {children}
+        <WebVitalsReporter />
       </body>
     </html>
   );

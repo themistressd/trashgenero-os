@@ -84,6 +84,7 @@ npm run build      # Construye para producción
 npm run start      # Inicia servidor de producción
 npm run lint       # Ejecuta ESLint
 npm run type-check # Verifica tipos TypeScript
+npm run test:smoke # Ejecuta smoke check local (lint + types + build)
 ```
 
 ---
@@ -155,6 +156,9 @@ NEXT_PUBLIC_WP_API_URL=https://your-wordpress-site.com/wp-json
 JWT_SECRET_KEY=your-jwt-secret
 # Solo para desarrollo/local: habilita fallbacks mock cuando no hay backend
 NEXT_PUBLIC_ALLOW_API_MOCKS=true
+# Observabilidad opcional de performance (Core Web Vitals)
+NEXT_PUBLIC_ENABLE_WEB_VITALS=false
+NEXT_PUBLIC_WEB_VITALS_ENDPOINT=
 ```
 
 ### WooCommerce
@@ -215,18 +219,31 @@ localStorage.removeItem('trash-os-boot')
 
 El sistema usa mock data cuando las APIs no están disponibles. Los errores de API se manejan gracefully sin romper la UI.
 
+### Observabilidad de performance (Web Vitals)
+
+- Activa `NEXT_PUBLIC_ENABLE_WEB_VITALS=true` para capturar métricas Core Web Vitals en cliente.
+- Si defines `NEXT_PUBLIC_WEB_VITALS_ENDPOINT`, se enviarán por `navigator.sendBeacon`.
+- Si no defines endpoint, en desarrollo se registran en consola (`[web-vitals]`).
+
+---
+
+## 📌 Documentos de seguimiento
+
+- [Auditoría de implementación](docs/PLAN_IMPLEMENTACION_AUDITORIA_2026-02-17.md)
+- [Análisis de brechas](docs/IMPLEMENTATION_GAP_ANALYSIS.md)
+- [Matriz de equivalencias de alcance](docs/SCOPE_EQUIVALENCE_MATRIX.md)
+
 ---
 
 ## 📝 To-Do
 
-- [ ] Implementar sistema completo de ventanas con drag & drop
-- [ ] Añadir las 9 aplicaciones del desktop
-- [ ] Integrar sonidos del sistema
-- [ ] Añadir sistema de notificaciones toast
-- [ ] Implementar wallpaper selector
-- [ ] Crear modo Trash-Mate (móvil) completo
-- [ ] Añadir Easter eggs y BSOD triggers
-- [ ] Testing completo
+- [ ] Endurecer integraciones reales WordPress/WooCommerce/GamiPress y limitar mocks a desarrollo.
+- [ ] Completar checkout transaccional real (estados de orden/pago y recuperación ante errores).
+- [ ] Definir smoke e2e de flujos core (boot, login, abrir app, compra, gamificación).
+- [ ] Ejecutar auditoría mínima de accesibilidad (teclado, foco, contraste, labels).
+- [ ] Definir observabilidad y performance (Core Web Vitals + error tracking).
+- [ ] Documentar equivalencias de alcance entre plan original y apps finales implementadas.
+- [ ] Completar la estrategia de testing automatizado (unit + e2e).
 
 ---
 
