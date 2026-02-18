@@ -16,15 +16,6 @@ import type {
 } from '@/types/gamification';
 
 const namespace = process.env.NEXT_PUBLIC_GAMIPRESS_API_NAMESPACE || 'trashgenero/v1';
-const isProduction = process.env.NODE_ENV === 'production';
-const allowMockFallback = process.env.NEXT_PUBLIC_ALLOW_API_MOCKS === 'true' || !isProduction;
-
-const fallbackOrThrow = <T>(fallbackValue: T): T => {
-  if (allowMockFallback) {
-    return fallbackValue;
-  }
-  throw new Error('GamiPress API unavailable and mock fallback is disabled in production.');
-};
 
 /**
  * GamiPress API client
