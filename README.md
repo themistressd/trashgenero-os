@@ -158,7 +158,7 @@ JWT_SECRET_KEY=your-jwt-secret
 NEXT_PUBLIC_ALLOW_API_MOCKS=true
 # Observabilidad opcional de performance (Core Web Vitals)
 NEXT_PUBLIC_ENABLE_WEB_VITALS=false
-NEXT_PUBLIC_WEB_VITALS_ENDPOINT=
+NEXT_PUBLIC_WEB_VITALS_ENDPOINT=/api/telemetry/web-vitals
 ```
 
 ### WooCommerce
@@ -222,6 +222,14 @@ El sistema usa mock data cuando las APIs no están disponibles. Los errores de A
 ### Observabilidad de performance (Web Vitals)
 
 - Activa `NEXT_PUBLIC_ENABLE_WEB_VITALS=true` para capturar métricas Core Web Vitals en cliente.
+- Si defines `NEXT_PUBLIC_WEB_VITALS_ENDPOINT`, se enviarán por `navigator.sendBeacon` (por defecto: `/api/telemetry/web-vitals`).
+- Si no defines endpoint, en desarrollo se registran en consola (`[web-vitals]`).
+
+### Endpoint de ingestión local
+
+- Se añadió `POST /api/telemetry/web-vitals` para recibir métricas desde cliente.
+- Valida payload mínimo (`id`, `name`, `value`) y registra evento estructurado en servidor.
+- Está pensado como baseline para luego conectar proveedor externo de observabilidad.
 - Si defines `NEXT_PUBLIC_WEB_VITALS_ENDPOINT`, se enviarán por `navigator.sendBeacon`.
 - Si no defines endpoint, en desarrollo se registran en consola (`[web-vitals]`).
 
