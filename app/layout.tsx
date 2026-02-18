@@ -3,6 +3,7 @@ import "./globals.css";
 import "@/styles/themes/trash-os.css";
 import "@/styles/themes/trash-mate.css";
 import WebVitalsReporter from "@/components/telemetry/WebVitalsReporter";
+import ErrorReporter from "@/components/telemetry/ErrorReporter";
 
 export const metadata: Metadata = {
   title: "TrashGènero OS - Digital Witchcraft meets Windows 95",
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         {children}
         <WebVitalsReporter />
+        <ErrorReporter />
       </body>
     </html>
   );

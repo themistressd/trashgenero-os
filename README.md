@@ -159,6 +159,9 @@ NEXT_PUBLIC_ALLOW_API_MOCKS=true
 # Observabilidad opcional de performance (Core Web Vitals)
 NEXT_PUBLIC_ENABLE_WEB_VITALS=false
 NEXT_PUBLIC_WEB_VITALS_ENDPOINT=/api/telemetry/web-vitals
+# Observabilidad opcional de errores cliente
+NEXT_PUBLIC_ENABLE_ERROR_REPORTING=false
+NEXT_PUBLIC_ERROR_REPORTING_ENDPOINT=/api/telemetry/errors
 ```
 
 ### WooCommerce
@@ -230,6 +233,12 @@ El sistema usa mock data cuando las APIs no están disponibles. Los errores de A
 - Se añadió `POST /api/telemetry/web-vitals` para recibir métricas desde cliente.
 - Valida payload mínimo (`id`, `name`, `value`) y registra evento estructurado en servidor.
 - Está pensado como baseline para luego conectar proveedor externo de observabilidad.
+
+### Observabilidad de errores cliente
+
+- Activa `NEXT_PUBLIC_ENABLE_ERROR_REPORTING=true` para capturar errores globales de navegador.
+- Se capturan eventos `window.error` y `window.unhandledrejection`.
+- Endpoint por defecto: `POST /api/telemetry/errors` (configurable por `NEXT_PUBLIC_ERROR_REPORTING_ENDPOINT`).
 - Si defines `NEXT_PUBLIC_WEB_VITALS_ENDPOINT`, se enviarán por `navigator.sendBeacon`.
 - Si no defines endpoint, en desarrollo se registran en consola (`[web-vitals]`).
 
