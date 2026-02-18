@@ -218,6 +218,14 @@ El sistema usa mock data cuando las APIs no están disponibles. Los errores de A
 
 ---
 
+## 📌 Documentos de seguimiento
+
+- [Auditoría de implementación](docs/PLAN_IMPLEMENTACION_AUDITORIA_2026-02-17.md)
+- [Análisis de brechas](docs/IMPLEMENTATION_GAP_ANALYSIS.md)
+- [Matriz de equivalencias de alcance](docs/SCOPE_EQUIVALENCE_MATRIX.md)
+
+---
+
 ## 📝 To-Do
 
 - [ ] Endurecer integraciones reales WordPress/WooCommerce/GamiPress y limitar mocks a desarrollo.
