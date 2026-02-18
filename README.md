@@ -84,6 +84,7 @@ npm run build      # Construye para producción
 npm run start      # Inicia servidor de producción
 npm run lint       # Ejecuta ESLint
 npm run type-check # Verifica tipos TypeScript
+npm run test:smoke # Ejecuta smoke check local (lint + types + build)
 ```
 
 ---

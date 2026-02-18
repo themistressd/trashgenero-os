@@ -1,4 +1,4 @@
-import apiClient, { makeAuthenticatedRequest } from './client';
+import { makeAuthenticatedRequest } from './client';
 import { resolveFallback } from '@/lib/config/apiFallback';
 import type {
   UserGamification,
@@ -272,5 +272,3 @@ export const getRecentActivity = async (limit: number = 10): Promise<ActivityLog
   }
 };
 
-// Prevent unused import warning
-void apiClient;
